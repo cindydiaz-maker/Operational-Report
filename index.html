@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Holcim: dashboard de incidentes</title>
+  <title>Holcim: Dashboard de Operaciones e Incidentes IT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,17 +12,15 @@
   <style>
     :root {
       --bg: #f3f5f6;
-      --card: #fff;
+      --card: #ffffff;
       --tx: #17262f;
       --mut: #5f7380;
       --line: #dde4e8;
       --p: #1d4370;
       --a: #04bbf1;
-      --bad: #e6007e;
       --good: #94c12e;
+      --bad: #e6007e;
       box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
@@ -46,7 +44,6 @@
       --a: #94c12e;
       --bad: #ff4fb8;
     }
-    
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -55,6 +52,7 @@
       font: 14px/1.45 "Montserrat", "Segoe UI", Roboto, Arial, sans-serif;
     }
     .foot { height: 12px; background: linear-gradient(90deg, #94c12e, #04bbf1, #1d4370); }
+    header { padding: 18px 20px 0; max-width: 1200px; margin: auto; }
     h1 { margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase; color: var(--p); }
     h1::after {
       content: "";
@@ -64,12 +62,9 @@
       border-radius: 2px;
       background: linear-gradient(90deg, #94c12e, #04bbf1, #1d4370);
     }
-    
-    header { padding: 18px 20px 0; max-width: 1200px; margin: auto; }
     .sub { color: var(--mut); font-size: 13px; margin-top: 2px; }
-    
     .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 14px 0 0; }
-    .bar label, .bar .lb { display: flex; flex-direction: column; font-size: 12px; color: var(--mut); gap: 3px; }
+    .bar label { display: flex; flex-direction: column; font-size: 12px; color: var(--mut); gap: 3px; }
     select, button {
       font: inherit;
       font-size: 13px;
@@ -81,8 +76,7 @@
     }
     button { cursor: pointer; transition: background 0.2s; }
     button:hover { background: var(--line); }
-    button:focus-visible, select:focus-visible { outline: 2px solid var(--p); outline-offset: 1px; }
-    
+
     .tabs { display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--line); overflow-x: auto; }
     .tabs button {
       border: 0;
@@ -95,12 +89,12 @@
       white-space: nowrap;
     }
     .tabs button.on { color: var(--tx); border-color: var(--p); font-weight: 600; }
-    
+
     main { max-width: 1200px; margin: auto; padding: 16px 20px 30px; }
     .view { display: none; }
     .view.on { display: block; }
-    
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
     .k {
       background: var(--card);
       border: 1px solid var(--line);
@@ -110,19 +104,18 @@
     }
     .k b { display: block; font-size: 26px; font-weight: 650; letter-spacing: -.02em; }
     .k span { font-size: 12px; color: var(--mut); }
-    .k.w { border-left-color: var(--p); }
     .k.r { border-left-color: var(--bad); }
     .k.g { border-left-color: var(--good); }
-    
+
     .g { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
     .c { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
     .c h2 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
     .ch { position: relative; height: 270px; }
     .wide { grid-column: 1 / -1; }
-    
+
     .cards2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 14px; }
     @media(max-width:760px) { .cards2 { grid-template-columns: 1fr; } }
-    
+
     .ic { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-height: 96px; }
     .ih { background: #041739; color: #fff; text-align: center; font-weight: 700; padding: 6px; }
     .icg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 12px 8px; text-align: center; }
@@ -130,151 +123,129 @@
     .icg b { font-size: 20px; }
     .icg .bad b { color: var(--bad); }
     .icg .big b { font-size: 22px; color: var(--a); }
-    
+
     .tw { overflow-x: auto; max-width: 100%; margin-top: 10px; }
     table { border-collapse: collapse; width: 100%; font-size: 13px; }
     th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
     th { color: #fff; font-weight: 600; position: sticky; top: 0; background: #041739; }
     tr:hover { background: rgba(0, 0, 0, 0.02); }
-    
-    #loc th:nth-child(n+2), #loc td:nth-child(n+2) { text-align: center; }
-    
-    .chips { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-    .chips > span { font-size: 12px; color: var(--mut); width: 48px; flex: none; }
-    .chips > div { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip {
-      border-radius: 16px;
-      padding: 4px 12px;
-      font-size: 12px;
-      border: 1px solid var(--line);
-      background: var(--card);
-      cursor: pointer;
-    }
-    .chip.on { background: var(--p); color: #fff; border-color: var(--p); }
-    
+
+    #loc th:nth-child(n+3), #loc td:nth-child(n+3) { text-align: center; }
+
     @media print {
-      .chips, .bar, .tabs, .noprint { display: none; }
-      .view { display: block !important; break-inside: avoid; }
+      .bar, .tabs { display: none; }
+      .view { display: block !important; }
       body { background: #fff; }
     }
-  </style>
+</style>
 </head>
 <body>
-
-  <header>
-    <h1>Holcim: Dashboard de Incidentes</h1>
-    <div class="sub">Sistema de Monitoreo de Seguridad Industrial y Salud Ocupacional</div>
-    
+<header>
+    <h1>Holcim: Dashboard de Operaciones IT</h1>
+    <div class="sub">Reporte acumulado de incidentes y servicios (Datos reales a Septiembre)</div>
     <div class="bar">
       <label>
-        Región / País
-        <select id="selRegion" onchange="applyFilters()">
-          <option value="ALL">Todas las regiones</option>
-          <option value="LATAM">Latinoamérica</option>
-          <option value="NA">Norteamérica</option>
-          <option value="EU">Europa</option>
-        </select>
-      </label>
-      <label>
-        Planta / Operación
-        <select id="selPlanta" onchange="applyFilters()">
-          <option value="ALL">Todas las plantas</option>
-          <option value="Planta Central">Planta Central</option>
-          <option value="Planta Norte">Planta Norte</option>
-          <option value="Cantera Sur">Cantera Sur</option>
-          <option value="Terminal Puerto">Terminal Puerto</option>
+        Unidad de Negocio / Empresa
+        <select id="selCompany" onchange="applyFilters()">
+          <option value="ALL">Todas las empresas (4,356)</option>
+          <option value="Americas Business Service Center">Americas Business Service Center (1,759)</option>
+          <option value="Holcim Argentina">Holcim Argentina (610)</option>
+          <option value="xLafarge Canada - ECAN">xLafarge Canada - ECAN (356)</option>
+          <option value="Holcim Perú">Holcim Perú (318)</option>
+          <option value="Holcim México">Holcim México (311)</option>
+          <option value="Holcim Ecuador">Holcim Ecuador (222)</option>
+          <option value="Holcim Colombia">Holcim Colombia (212)</option>
+          <option value="Holcim Corporate France">Holcim Corporate France (123)</option>
+          <option value="Holcim El Salvador">Holcim El Salvador (111)</option>
         </select>
       </label>
       <button onclick="toggleTheme()">🌓 Cambiar Tema</button>
-      <button onclick="exportData()" class="noprint">📊 Exportar a Excel</button>
+      <button onclick="exportData()">📊 Exportar a Excel</button>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn on" onclick="switchTab(0)">General</button>
-      <button class="tab-btn" onclick="switchTab(1)">Ubicaciones</button>
-      <button class="tab-btn" onclick="switchTab(2)">Tendencias</button>
+      <button class="tab-btn on" onclick="switchTab(0)">Vista General</button>
+      <button class="tab-btn" onclick="switchTab(1)">Unidades de Negocio</button>
+      <button class="tab-btn" onclick="switchTab(2)">Tendencias Mensuales</button>
     </div>
-  </header>
-
-  <main>
+</header>
+<main>
     <!-- VISTA 1: GENERAL -->
     <div class="view on" id="view-0">
       <div class="kpis">
-        <div class="k g">
-          <b id="kpi-days">285</b>
-          <span>Días sin Accidentes</span>
+        <div class="k">
+          <b id="kpi-total">4,356</b>
+          <span>Total Incidentes</span>
         </div>
-        <div class="k w">
-          <b id="kpi-total">142</b>
-          <span>Total Incidentes (YTD)</span>
+        <div class="k g">
+          <b id="kpi-sla">100%</b>
+          <span>Cumplimiento SLA</span>
+        </div>
+        <div class="k">
+          <b id="kpi-closed">83.9%</b>
+          <span>Tasa de Cierre</span>
         </div>
         <div class="k r">
-          <b id="kpi-high">4</b>
-          <span>Severidad Alta (LTI)</span>
+          <b id="kpi-p1">6</b>
+          <span>Incidentes P1 (Críticos)</span>
         </div>
-        <div class="k w">
-          <b id="kpi-med">38</b>
-          <span>Severidad Media</span>
-        </div>
-        <div class="k g">
-          <b id="kpi-low">100</b>
-          <span>Severidad Baja / Near Miss</span>
+        <div class="k">
+          <b id="kpi-reopen">2.15%</b>
+          <span>Tasa de Reapertura</span>
         </div>
       </div>
-
       <div class="cards2">
         <div class="ic">
-          <div class="ih">RESUMEN ANUAL DE SEGURIDAD</div>
+          <div class="ih">DISTRIBUCIÓN POR PRIORIDAD / SEVERIDAD</div>
           <div class="icg">
-            <div class="big"><b id="card-ltifr">0.42</b><span>LTIFR</span></div>
-            <div><b id="card-tri">12</b><span>TRI</span></div>
-            <div class="bad"><b id="card-high">4</b><span>Graves</span></div>
-            <div><b id="card-closed">94%</b><span>Cerrados</span></div>
+            <div class="bad"><b id="p1-val">6</b><span>P1 - Alta</span></div>
+            <div><b id="p2-val">1,080</b><span>P2 - Media</span></div>
+            <div class="big"><b id="p3-val">3,270</b><span>P3 - Baja</span></div>
+            <div><b id="reassign-val">0.26</b><span>Reasignaciones Avg</span></div>
           </div>
         </div>
         <div class="ic">
-          <div class="ih">INSPECCIONES Y PREVENCIÓN</div>
+          <div class="ih">DESEMPEÑO Y RESOLUCIÓN OPERATIVA</div>
           <div class="icg">
-            <div class="big"><b id="card-obs">1,240</b><span>Observaciones</span></div>
-            <div><b id="card-audit">88</b><span>Auditorías</span></div>
-            <div><b id="card-train">96%</b><span>Capacitación</span></div>
-            <div><b id="card-actions">15</b><span>Acciones Pdt.</span></div>
+            <div class="big"><b id="c-closed">3,657</b><span>Cerrados/Resueltos</span></div>
+            <div><b>605</b><span>En Progreso</span></div>
+            <div><b>94</b><span>Reabiertos</span></div>
+            <div class="big"><b style="color:var(--good)">100%</b><span>SLA On-Time</span></div>
           </div>
         </div>
       </div>
 
       <div class="g">
         <div class="c">
-          <h2>Incidentes por Severidad</h2>
-          <div class="ch"><canvas id="chartSeverity"></canvas></div>
+          <h2>Incidentes por Prioridad</h2>
+          <div class="ch"><canvas id="chartPriority"></canvas></div>
         </div>
         <div class="c">
-          <h2>Incidentes por Tipo / Causa</h2>
-          <div class="ch"><canvas id="chartType"></canvas></div>
+          <h2>Top Categorías de Servicio</h2>
+          <div class="ch"><canvas id="chartCategory"></canvas></div>
         </div>
       </div>
     </div>
 
-    <!-- VISTA 2: UBICACIONES -->
+    <!-- VISTA 2: UNIDADES DE NEGOCIO -->
     <div class="view" id="view-1">
       <div class="c wide">
-        <h2>Detalle de Incidentes por Planta y Ubicación</h2>
+        <h2>Reporte de Incidentes por Empresa / Unidad de Negocio</h2>
         <div class="tw">
           <table id="loc">
             <thead>
               <tr>
-                <th>Planta / Ubicación</th>
-                <th>Región</th>
+                <th>Empresa / Unidad</th>
                 <th>Total Incidentes</th>
-                <th>Alta (LTI)</th>
-                <th>Media</th>
-                <th>Baja / Near Miss</th>
-                <th>Días sin Accidentes</th>
-                <th>Estado Compliance</th>
+                <th>P1 (Alta)</th>
+                <th>P2 (Media)</th>
+                <th>P3 (Baja)</th>
+                <th>% Cierre</th>
+                <th>Estado Compliance SLA</th>
               </tr>
             </thead>
             <tbody id="locTableBody">
-              <!-- Cargado dinámicamente -->
+              <!-- Cargado por JavaScript -->
             </tbody>
           </table>
         </div>
@@ -284,167 +255,147 @@
     <!-- VISTA 3: TENDENCIAS -->
     <div class="view" id="view-2">
       <div class="c wide">
-        <h2>Evolución Mensual de Incidentes (Comparativo)</h2>
+        <h2>Evolución Mensual de Incidentes (Enero - Septiembre)</h2>
         <div class="ch" style="height: 380px;"><canvas id="chartTrend"></canvas></div>
       </div>
     </div>
-  </main>
-
-  <footer class="foot"></footer>
-
-  <script>
-    // Datos de Muestra
-    const locationData = [
-      { name: "Planta Central", region: "LATAM", total: 45, high: 1, med: 12, low: 32, days: 310, status: "Excelente" },
-      { name: "Planta Norte", region: "LATAM", total: 38, high: 2, med: 10, low: 26, days: 145, status: "Aceptable" },
-      { name: "Cantera Sur", region: "NA", total: 29, high: 0, med: 8, low: 21, days: 420, status: "Excelente" },
-      { name: "Terminal Puerto", region: "EU", total: 30, high: 1, med: 8, low: 21, days: 98, status: "Atención Requ." }
+</main>
+<div class="foot"></div>
+<script>
+    // Datos reales consolidados de la base de datos
+    const rawData = [
+      { name: "Americas Business Service Center", total: 1759, p1: 3, p2: 436, p3: 1320, closed: 1480, sla: "100%" },
+      { name: "Holcim Argentina", total: 610, p1: 1, p2: 152, p3: 457, closed: 512, sla: "100%" },
+      { name: "xLafarge Canada - ECAN", total: 356, p1: 0, p2: 88, p3: 268, closed: 298, sla: "100%" },
+      { name: "Holcim Perú", total: 318, p1: 1, p2: 79, p3: 238, closed: 267, sla: "100%" },
+      { name: "Holcim México", total: 311, p1: 0, p2: 77, p3: 234, closed: 261, sla: "100%" },
+      { name: "Holcim Ecuador", total: 222, p1: 0, p2: 55, p3: 167, closed: 186, sla: "100%" },
+      { name: "Holcim Colombia", total: 212, p1: 1, p2: 53, p3: 158, closed: 178, sla: "100%" },
+      { name: "Holcim Corporate France", total: 123, p1: 0, p2: 30, p3: 93, closed: 103, sla: "100%" },
+      { name: "Holcim El Salvador", total: 111, p1: 0, p2: 28, p3: 83, closed: 93, sla: "100%" },
+      { name: "Americas Digital Center", total: 94, p1: 0, p2: 23, p3: 71, closed: 79, sla: "100%" },
+      { name: "Otros", total: 240, p1: 0, p2: 59, p3: 181, closed: 200, sla: "100%" }
     ];
 
-    let chartSeverityInstance = null;
-    let chartTypeInstance = null;
-    let chartTrendInstance = null;
+    let chartP, chartC, chartT;
 
     function initCharts() {
-      // Chart Severidad (Doughnut)
-      const ctxSev = document.getElementById('chartSeverity').getContext('2d');
-      chartSeverityInstance = new Chart(ctxSev, {
+      // Gráfico de Prioridad
+      const ctxP = document.getElementById('chartPriority').getContext('2d');
+      chartP = new Chart(ctxP, {
         type: 'doughnut',
         data: {
-          labels: ['Alta (LTI)', 'Media', 'Baja / Near Miss'],
+          labels: ['P1 - Alta', 'P2 - Media', 'P3 - Baja'],
           datasets: [{
-            data: [4, 38, 100],
-            backgroundColor: ['#e6007e', '#04bbf1', '#94c12e']
+            data: [6, 1080, 3270],
+            backgroundColor: ['#e6007e', '#04bbf1', '#1d4370']
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom' } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
       });
 
-      // Chart Tipo de Incidente (Bar)
-      const ctxType = document.getElementById('chartType').getContext('2d');
-      chartTypeInstance = new Chart(ctxType, {
+      // Gráfico de Categorías
+      const ctxC = document.getElementById('chartCategory').getContext('2d');
+      chartC = new Chart(ctxC, {
         type: 'bar',
         data: {
-          labels: ['Caídas', 'EPI / EPP', 'Maquinaria', 'Cortes/Golpes', 'Ergonomía'],
+          labels: ['Software', 'Security', 'Finances & Ctrl', 'Cloud', 'SAP SD', 'DataRooms', 'SRM', 'SAP MM', 'Hardware'],
           datasets: [{
-            label: 'Número de Casos',
-            data: [24, 45, 12, 38, 23],
+            label: 'Incidentes',
+            data: [863, 548, 355, 297, 195, 191, 160, 157, 129],
             backgroundColor: '#1d4370'
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
       });
 
-      // Chart Tendencias (Line)
-      const ctxTrend = document.getElementById('chartTrend').getContext('2d');
-      chartTrendInstance = new Chart(ctxTrend, {
+      // Gráfico de Tendencia Mensual
+      const ctxT = document.getElementById('chartTrend').getContext('2d');
+      chartT = new Chart(ctxT, {
         type: 'line',
         data: {
-          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-          datasets: [
-            {
-              label: 'Near Miss / Baja',
-              data: [8, 12, 9, 11, 15, 10, 8, 14, 13, 10, 0, 0],
-              borderColor: '#94c12e',
-              tension: 0.3,
-              fill: false
-            },
-            {
-              label: 'Severidad Media / Alta',
-              data: [4, 3, 5, 2, 6, 3, 2, 5, 4, 3, 0, 0],
-              borderColor: '#e6007e',
-              tension: 0.3,
-              fill: false
-            }
-          ]
+          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep'],
+          datasets: [{
+            label: 'Incidentes Mensuales (2024)',
+            data: [553, 378, 484, 457, 437, 416, 429, 406, 360],
+            borderColor: '#04bbf1',
+            backgroundColor: 'rgba(4, 187, 241, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5,
+            pointHoverRadius: 8
+          }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'top' } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
       });
     }
 
     function renderTable() {
       const tbody = document.getElementById('locTableBody');
-      const regionFilter = document.getElementById('selRegion').value;
-      const plantaFilter = document.getElementById('selPlanta').value;
-
       tbody.innerHTML = '';
-
-      locationData.forEach(item => {
-        if (regionFilter !== 'ALL' && item.region !== regionFilter) return;
-        if (plantaFilter !== 'ALL' && item.name !== plantaFilter) return;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${item.name}</strong></td>
-          <td>${item.region}</td>
-          <td>${item.total}</td>
-          <td style="color: var(--bad); font-weight: bold;">${item.high}</td>
-          <td>${item.med}</td>
-          <td>${item.low}</td>
-          <td>${item.days}</td>
-          <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 11px; background: rgba(148,193,46,0.2); color: var(--tx);">${item.status}</span></td>
+      rawData.forEach(item => {
+        const pct = Math.round((item.closed / item.total) * 100);
+        tbody.innerHTML += `
+          <tr>
+            <td><b>${item.name}</b></td>
+            <td>${item.total.toLocaleString()}</td>
+            <td style="color:${item.p1 > 0 ? 'var(--bad)' : 'inherit'}"><b>${item.p1}</b></td>
+            <td>${item.p2}</td>
+            <td>${item.p3}</td>
+            <td><b>${pct}%</b></td>
+            <td><span style="color:var(--good); font-weight:bold;">100% OK</span></td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
     }
 
-    function switchTab(index) {
+    function switchTab(idx) {
       document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('on', i === index);
+        btn.classList.toggle('on', i === idx);
       });
-      document.querySelectorAll('.view').forEach((view, i) => {
-        view.classList.toggle('on', i === index);
+      document.querySelectorAll('.view').forEach((v, i) => {
+        v.classList.toggle('on', i === idx);
       });
-    }
-
-    function toggleTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      if (currentTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
     }
 
     function applyFilters() {
-      renderTable();
-      // Opcional: Modificar dinámicamente los KPIs según filtros
-      const reg = document.getElementById('selRegion').value;
-      if (reg === 'LATAM') {
-        document.getElementById('kpi-total').innerText = '83';
-        document.getElementById('kpi-high').innerText = '3';
-      } else if (reg === 'NA') {
-        document.getElementById('kpi-total').innerText = '29';
-        document.getElementById('kpi-high').innerText = '0';
+      const selected = document.getElementById('selCompany').value;
+      if (selected === 'ALL') {
+        document.getElementById('kpi-total').innerText = '4,356';
+        document.getElementById('kpi-p1').innerText = '6';
+        document.getElementById('p1-val').innerText = '6';
+        document.getElementById('p2-val').innerText = '1,080';
+        document.getElementById('p3-val').innerText = '3,270';
+        chartP.data.datasets[0].data = [6, 1080, 3270];
       } else {
-        document.getElementById('kpi-total').innerText = '142';
-        document.getElementById('kpi-high').innerText = '4';
+        const match = rawData.find(d => d.name === selected);
+        if (match) {
+          document.getElementById('kpi-total').innerText = match.total.toLocaleString();
+          document.getElementById('kpi-p1').innerText = match.p1;
+          document.getElementById('p1-val').innerText = match.p1;
+          document.getElementById('p2-val').innerText = match.p2;
+          document.getElementById('p3-val').innerText = match.p3;
+          chartP.data.datasets[0].data = [match.p1, match.p2, match.p3];
+        }
       }
+      chartP.update();
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
     function exportData() {
-      const ws = XLSX.utils.json_to_sheet(locationData);
+      const ws = XLSX.utils.json_to_sheet(rawData);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Incidentes_Ubicacion");
-      XLSX.writeFile(wb, "Holcim_Incidentes_Report.xlsx");
+      XLSX.utils.book_append_sheet(wb, ws, "Incidentes");
+      XLSX.writeFile(wb, "Holcim_Reporte_Incidentes.xlsx");
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    window.onload = () => {
       initCharts();
       renderTable();
-    });
-  </script>
+    };
 </body>
 </html>
