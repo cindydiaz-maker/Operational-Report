@@ -1,4 +1,4 @@
-# Instrucciones para agentes (Cursor, Claude Code y otros)
+# Instrucciones para agentes (Cursor y otros)
 
 ## Qué es
 `index.html` es una aplicación de un solo archivo (HTML, CSS y JavaScript). Los datos de incidentes van incrustados en el mismo archivo. Las gráficas usan Chart.js desde CDN y la letra es Montserrat (Google Fonts). Lee el archivo antes de editarlo: es grande y tiene su propio JavaScript para filtros, gráficas y exportación a PowerPoint.
