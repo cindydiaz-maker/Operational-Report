@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LA - Monthly Operations Report</title>
+  <style>
+    body { margin: 0; font: 14px/1.45 Montserrat, "Segoe UI", sans-serif; background: #f3f5f7; color: #17262f; }
+    header { background: #041739; color: #fff; padding: 18px 24px; }
+    header small { color: #94c12e; font-weight: 700; letter-spacing: .14em; }
+    h1 { margin: 2px 0 0; font-size: 22px; }
+    main { max-width: 900px; margin: 0 auto; padding: 20px 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card { background: #fff; border: 1px solid #dde3ea; border-top: 4px solid #1d4370; border-radius: 10px; padding: 14px; }
+    .card b { display: block; font-size: 28px; }
+    .card span { color: #5c7080; font-size: 12px; font-weight: 600; }
+    .card.off { border-top-color: #dde3ea; }
+    .err { color: #d8452b; }
+    .nota { color: #5c7080; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <small>HOLCIM</small>
+    <h1>LA - Monthly Operations Report</h1>
+  </header>
+  <main>
+    <div class="grid" id="modulos">
+      <div class="card off"><span>Consultando ServiceNow…</span></div>
+    </div>
+    <p class="nota">Esta página solo confirma que Apps Script lee ServiceNow. La vista completa del reporte está en <code>index.html</code> en la raíz del repositorio.</p>
+  </main>
+  <script>
+    var NOMBRES = { incidents: "Incidents", request: "Request", changes: "Changes" };
+
+    function esc(texto) {
+      return String(texto).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function pintar(datos) {
+      var html = Object.keys(NOMBRES).map(function (clave) {
+        var modulo = datos[clave];
+        if (modulo && modulo.ok) {
+          return '<div class="card"><b>' + modulo.count.toLocaleString("es-CO") + "</b><span>" + NOMBRES[clave] + "</span></div>";
+        }
+        var motivo = modulo ? (modulo.motivo || ("Error " + modulo.codigo)) : "Sin respuesta";
+        return '<div class="card off"><b class="err">—</b><span>' + NOMBRES[clave] + " · " + esc(motivo) + "</span></div>";
+      }).join("");
+      document.getElementById("modulos").innerHTML = html;
+    }
+
+    function fallo(error) {
+      document.getElementById("modulos").innerHTML =
+        '<div class="card off"><span class="err">' + esc(error.message) + "</span></div>";
+    }
+
+    google.script.run.withSuccessHandler(pintar).withFailureHandler(fallo).getReport();
+  </script>
+</body>
+</html>

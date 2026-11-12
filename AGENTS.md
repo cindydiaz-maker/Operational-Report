@@ -7,6 +7,7 @@
 - Barra superior: **Incidents**, **Request**, **Changes**.
 - Dentro de Incidents: General Data, Data por país, Data por team, Performance YTD, Tendencias.
 - Request y Changes están vacías ("Sin datos cargados"). No inventes datos: espera el export de ServiceNow.
+- `apps-script/` tiene el proyecto de Google Apps Script que consulta ServiceNow. Lee `apps-script/README.md` antes de tocarlo. Las credenciales y los queries van en las propiedades del script, nunca en el código.
 
 ## Convenciones acordadas con el dueño del proyecto (verifícalas en el código antes de cambiar nada)
 - Idioma de la interfaz: español, con términos de ITSM en inglés. Usar "incidentes", no "tickets".
