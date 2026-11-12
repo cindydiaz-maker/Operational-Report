@@ -3,400 +3,1055 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Holcim: Dashboard de Operaciones e Incidentes IT</title>
+  <title>LA - Monthly Operations Report</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23041739'/%3E%3Crect y='24' width='32' height='8' fill='%2394c12e'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <style>
     :root {
-      --bg: #f3f5f6;
+      --premium: #041739;
+      --medium: #1d4370;
+      --bright: #04bbf1;
+      --green: #4bb05b;
+      --lime: #94c12e;
+      --fuchsia: #e6007e;
+      --sla-bad: #d8452b;
+      --sla-mid: #d99a00;
+      --bg: #f3f5f7;
       --card: #ffffff;
-      --tx: #17262f;
-      --mut: #5f7380;
-      --line: #dde4e8;
-      --p: #1d4370;
-      --a: #04bbf1;
-      --good: #94c12e;
-      --bad: #e6007e;
-      box-sizing: border-box;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #0f171d;
-        --card: #17222b;
-        --tx: #e5edf1;
-        --mut: #90a3af;
-        --line: #293842;
-        --p: #04bbf1;
-        --a: #94c12e;
-        --bad: #ff4fb8;
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #0f171d;
-      --card: #17222b;
-      --tx: #e5edf1;
-      --mut: #90a3af;
-      --line: #293842;
-      --p: #04bbf1;
-      --a: #94c12e;
-      --bad: #ff4fb8;
+      --text: #17262f;
+      --muted: #5c7080;
+      --line: #dde3ea;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       background: var(--bg);
-      color: var(--tx);
-      font: 14px/1.45 "Montserrat", "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      font: 14px/1.45 Montserrat, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
-    .foot { height: 12px; background: linear-gradient(90deg, #94c12e, #04bbf1, #1d4370); }
-    header { padding: 18px 20px 0; max-width: 1200px; margin: auto; }
-    h1 { margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase; color: var(--p); }
-    h1::after {
-      content: "";
-      display: block;
-      height: 4px;
-      margin-top: 8px;
-      border-radius: 2px;
-      background: linear-gradient(90deg, #94c12e, #04bbf1, #1d4370);
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--bright); outline-offset: 2px; }
+    button:disabled { opacity: 0.65; cursor: wait; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    header { position: sticky; top: 0; z-index: 20; }
+    .top { background: var(--premium); color: #fff; }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      padding-top: 18px;
     }
-    .sub { color: var(--mut); font-size: 13px; margin-top: 2px; }
-    .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 14px 0 0; }
-    .bar label { display: flex; flex-direction: column; font-size: 12px; color: var(--mut); gap: 3px; }
-    select, button {
-      font: inherit;
-      font-size: 13px;
-      padding: 6px 12px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--card);
-      color: var(--tx);
+    .brand {
+      color: var(--lime);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
     }
-    button { cursor: pointer; transition: background 0.2s; }
-    button:hover { background: var(--line); }
-
-    .tabs { display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--line); overflow-x: auto; }
-    .tabs button {
+    h1 { margin: 2px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+    .sub { margin: 4px 0 0; color: rgba(255, 255, 255, 0.72); font-size: 13px; }
+    .export {
+      background: var(--lime);
+      color: var(--premium);
       border: 0;
-      border-bottom: 3px solid transparent;
-      border-radius: 0;
-      background: none;
-      padding: 9px 14px;
-      color: var(--mut);
-      font-size: 14px;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 800;
       white-space: nowrap;
     }
-    .tabs button.on { color: var(--tx); border-color: var(--p); font-weight: 600; }
-
-    main { max-width: 1200px; margin: auto; padding: 16px 20px 30px; }
-    .view { display: none; }
-    .view.on { display: block; }
-
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
-    .k {
+    .export:hover { filter: brightness(1.05); }
+    .modtabs { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+    .modtabs button {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.68);
+      border: 0;
+      border-bottom: 3px solid transparent;
+      padding: 10px 14px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .modtabs button:hover, .modtabs button.on { color: #fff; }
+    .modtabs button.on { border-bottom-color: var(--lime); }
+    .tools { background: #fff; border-bottom: 1px solid var(--line); padding: 12px 0 0; }
+    body[data-module="request"] .tools,
+    body[data-module="changes"] .tools { display: none; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+    .textbtn {
+      background: transparent;
+      border: 0;
+      color: var(--medium);
+      font-weight: 700;
+      padding: 10px 4px;
+    }
+    .subtabs { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+    .subtabs button {
+      background: transparent;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      padding: 10px 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .subtabs button:hover, .subtabs button.on { color: var(--premium); }
+    .subtabs button.on { border-bottom-color: var(--bright); }
+    main { padding-top: 18px; padding-bottom: 36px; }
+    .summary { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .kpi, .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px 14px;
-      border-left: 4px solid var(--p);
+      border-radius: 10px;
     }
-    .k b { display: block; font-size: 26px; font-weight: 650; letter-spacing: -.02em; }
-    .k span { font-size: 12px; color: var(--mut); }
-    .k.r { border-left-color: var(--bad); }
-    .k.g { border-left-color: var(--good); }
-
-    .g { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
-    .c { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
-    .c h2 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
-    .ch { position: relative; height: 270px; }
-    .wide { grid-column: 1 / -1; }
-
-    .cards2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 14px; }
-    @media(max-width:760px) { .cards2 { grid-template-columns: 1fr; } }
-
-    .ic { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-height: 96px; }
-    .ih { background: #041739; color: #fff; text-align: center; font-weight: 700; padding: 6px; }
-    .icg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 12px 8px; text-align: center; }
-    .icg span { display: block; font-size: 11px; color: var(--mut); }
-    .icg b { font-size: 20px; }
-    .icg .bad b { color: var(--bad); }
-    .icg .big b { font-size: 22px; color: var(--a); }
-
-    .tw { overflow-x: auto; max-width: 100%; margin-top: 10px; }
+    .kpi { padding: 14px 14px 12px; border-top: 4px solid var(--premium); }
+    .kpi b { display: block; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+    .kpi span, .kpi small { display: block; color: var(--muted); }
+    .kpi span { margin-top: 2px; font-size: 12px; font-weight: 600; }
+    .kpi small { margin-top: 6px; font-size: 11px; }
+    .kpi.tone-ok { border-top-color: var(--bright); }
+    .kpi.tone-mid { border-top-color: var(--sla-mid); }
+    .kpi.tone-bad { border-top-color: var(--sla-bad); }
+    .kpi.tone-green { border-top-color: var(--green); }
+    .kpi.tone-hot { border-top-color: var(--sla-bad); }
+    .hot { color: var(--sla-bad); }
+    .breach { color: var(--fuchsia); font-weight: 800; }
+    .cards2, .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .card { padding: 14px 16px 16px; }
+    .card h2 { margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+    .card + .card { margin-top: 0; }
+    main .card { margin-bottom: 14px; }
+    .grid .card, .cards2 .card { margin-bottom: 0; }
+    .statgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+    .statgrid b { display: block; font-size: 22px; font-weight: 800; }
+    .statgrid span { color: var(--muted); font-size: 11px; }
+    .chart { position: relative; height: 280px; }
+    .chart.tall { height: 380px; }
+    .tw { overflow: auto; max-height: 540px; }
     table { border-collapse: collapse; width: 100%; font-size: 13px; }
-    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-    th { color: #fff; font-weight: 600; position: sticky; top: 0; background: #041739; }
-    tr:hover { background: rgba(0, 0, 0, 0.02); }
-
-    #loc th:nth-child(n+3), #loc td:nth-child(n+3) { text-align: center; }
-
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--premium);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+    th:first-child, td:first-child { text-align: left; position: sticky; left: 0; }
+    th:first-child { z-index: 3; }
+    td:first-child { z-index: 1; }
+    td { text-align: right; font-variant-numeric: tabular-nums; background: #fff; }
+    tr:nth-child(even) td { background: #f7fafb; }
+    .sem { font-weight: 800; }
+    .sem-ok { color: var(--bright); }
+    .sem-mid { color: var(--sla-mid); }
+    .sem-bad { color: var(--sla-bad); }
+    .sem-na { color: var(--muted); font-weight: 600; }
+    .mix { display: flex; width: 96px; height: 8px; border-radius: 99px; overflow: hidden; background: #e7eef2; margin-left: auto; }
+    .mix i { display: block; height: 100%; }
+    .mix .p1 { background: var(--fuchsia); }
+    .mix .p2 { background: var(--bright); }
+    .mix .p3 { background: var(--medium); }
+    .legend { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+    .legend li { display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot.ok { background: var(--bright); }
+    .dot.mid { background: var(--sla-mid); }
+    .dot.bad { background: var(--sla-bad); }
+    .dot.breach { background: var(--fuchsia); }
+    .note, .empty-inline { color: var(--muted); font-size: 13px; }
+    .empty-state { text-align: center; padding: 64px 24px; }
+    .empty-state h2 { font-size: 22px; }
+    .eyebrow { margin: 0 0 6px; color: var(--medium); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .ms { position: relative; }
+    .ms-btn {
+      min-width: 200px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 12px;
+      text-align: left;
+    }
+    .ms-k { display: block; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .ms-v { display: block; color: var(--premium); font-weight: 800; font-size: 13px; }
+    .chev { color: var(--muted); transition: transform 0.15s; }
+    .ms.open .chev { transform: rotate(180deg); }
+    .ms-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 360px;
+      max-width: 86vw;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(4, 23, 57, 0.16);
+      padding: 8px;
+      z-index: 40;
+    }
+    .ms.open .ms-panel { display: block; }
+    .ms-search, .ms-row { width: 100%; }
+    .ms-search {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+    }
+    .ms-meta { color: var(--muted); font-size: 12px; padding: 2px 4px 6px; }
+    .ms-list { max-height: 280px; overflow: auto; }
+    .ms-row {
+      display: grid;
+      grid-template-columns: 18px 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 5px 4px;
+    }
+    .ms-row[hidden], .none[hidden] { display: none; }
+    .ms-row .nm { cursor: pointer; }
+    .cnt { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+    .solo {
+      border: 0;
+      background: transparent;
+      color: var(--medium);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 4px;
+    }
+    .solo:hover { color: var(--bright); }
+    .none { color: var(--muted); font-size: 13px; padding: 8px 4px; }
+    .foot { height: 8px; background: linear-gradient(90deg, var(--lime), var(--bright), var(--medium)); }
+    @media (max-width: 980px) {
+      .kpis, .statgrid { grid-template-columns: 1fr 1fr; }
+      .cards2, .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 22px; }
+    }
+    @media (max-width: 640px) {
+      .top-row { flex-direction: column; align-items: stretch; }
+      .kpis, .statgrid { grid-template-columns: 1fr; }
+    }
     @media print {
-      .bar, .tabs { display: none; }
-      .view { display: block !important; }
+      header, .foot { position: static; }
+      .export, .filters, .modtabs { display: none; }
+      .tools { display: block !important; }
       body { background: #fff; }
     }
-</style>
+  </style>
 </head>
 <body>
-<header>
-    <h1>Holcim: Dashboard de Operaciones IT</h1>
-    <div class="sub">Reporte acumulado de incidentes y servicios (Datos reales a Septiembre)</div>
-    <div class="bar">
-      <label>
-        Unidad de Negocio / Empresa
-        <select id="selCompany" onchange="applyFilters()">
-          <option value="ALL">Todas las empresas (4,356)</option>
-          <option value="Americas Business Service Center">Americas Business Service Center (1,759)</option>
-          <option value="Holcim Argentina">Holcim Argentina (610)</option>
-          <option value="xLafarge Canada - ECAN">xLafarge Canada - ECAN (356)</option>
-          <option value="Holcim Perú">Holcim Perú (318)</option>
-          <option value="Holcim México">Holcim México (311)</option>
-          <option value="Holcim Ecuador">Holcim Ecuador (222)</option>
-          <option value="Holcim Colombia">Holcim Colombia (212)</option>
-          <option value="Holcim Corporate France">Holcim Corporate France (123)</option>
-          <option value="Holcim El Salvador">Holcim El Salvador (111)</option>
-        </select>
-      </label>
-      <button onclick="toggleTheme()">🌓 Cambiar Tema</button>
-      <button onclick="exportData()">📊 Exportar a Excel</button>
-    </div>
-
-    <div class="tabs">
-      <button class="tab-btn on" onclick="switchTab(0)">Vista General</button>
-      <button class="tab-btn" onclick="switchTab(1)">Unidades de Negocio</button>
-      <button class="tab-btn" onclick="switchTab(2)">Tendencias Mensuales</button>
-    </div>
-</header>
-<main>
-    <!-- VISTA 1: GENERAL -->
-    <div class="view on" id="view-0">
-      <div class="kpis">
-        <div class="k">
-          <b id="kpi-total">4,356</b>
-          <span>Total Incidentes</span>
+  <header>
+    <div class="top">
+      <div class="wrap top-row">
+        <div>
+          <div class="brand">HOLCIM</div>
+          <h1>LA - Monthly Operations Report</h1>
+          <p class="sub">Incidentes · enero a septiembre</p>
         </div>
-        <div class="k g">
-          <b id="kpi-sla">100%</b>
-          <span>Cumplimiento SLA</span>
-        </div>
-        <div class="k">
-          <b id="kpi-closed">83.9%</b>
-          <span>Tasa de Cierre</span>
-        </div>
-        <div class="k r">
-          <b id="kpi-p1">6</b>
-          <span>Incidentes P1 (Críticos)</span>
-        </div>
-        <div class="k">
-          <b id="kpi-reopen">2.15%</b>
-          <span>Tasa de Reapertura</span>
-        </div>
+        <button id="export" class="export" type="button">Exportar a PowerPoint</button>
       </div>
-      <div class="cards2">
-        <div class="ic">
-          <div class="ih">DISTRIBUCIÓN POR PRIORIDAD / SEVERIDAD</div>
-          <div class="icg">
-            <div class="bad"><b id="p1-val">6</b><span>P1 - Alta</span></div>
-            <div><b id="p2-val">1,080</b><span>P2 - Media</span></div>
-            <div class="big"><b id="p3-val">3,270</b><span>P3 - Baja</span></div>
-            <div><b id="reassign-val">0.26</b><span>Reasignaciones Avg</span></div>
-          </div>
-        </div>
-        <div class="ic">
-          <div class="ih">DESEMPEÑO Y RESOLUCIÓN OPERATIVA</div>
-          <div class="icg">
-            <div class="big"><b id="c-closed">3,657</b><span>Cerrados/Resueltos</span></div>
-            <div><b>605</b><span>En Progreso</span></div>
-            <div><b>94</b><span>Reabiertos</span></div>
-            <div class="big"><b style="color:var(--good)">100%</b><span>SLA On-Time</span></div>
-          </div>
-        </div>
+      <div class="wrap modtabs" role="tablist" aria-label="Módulos">
+        <button type="button" role="tab" data-module="incidents" aria-selected="true">Incidents</button>
+        <button type="button" role="tab" data-module="request" aria-selected="false">Request</button>
+        <button type="button" role="tab" data-module="changes" aria-selected="false">Changes</button>
       </div>
-
-      <div class="g">
-        <div class="c">
-          <h2>Incidentes por Prioridad</h2>
-          <div class="ch"><canvas id="chartPriority"></canvas></div>
+    </div>
+    <div class="tools">
+      <div class="wrap">
+        <div class="filters">
+          <div id="ms-company"></div>
+          <div id="ms-country"></div>
+          <div id="ms-priority"></div>
+          <button id="reset" class="textbtn" type="button">Restablecer</button>
         </div>
-        <div class="c">
-          <h2>Top Categorías de Servicio</h2>
-          <div class="ch"><canvas id="chartCategory"></canvas></div>
+        <div class="subtabs" role="tablist" aria-label="Vistas de incidentes">
+          <button type="button" role="tab" data-view="general" aria-selected="true">General Data</button>
+          <button type="button" role="tab" data-view="country" aria-selected="false">Data por país</button>
+          <button type="button" role="tab" data-view="team" aria-selected="false">Data por team</button>
+          <button type="button" role="tab" data-view="ytd" aria-selected="false">Performance YTD</button>
+          <button type="button" role="tab" data-view="trend" aria-selected="false">Tendencias</button>
         </div>
       </div>
     </div>
-
-    <!-- VISTA 2: UNIDADES DE NEGOCIO -->
-    <div class="view" id="view-1">
-      <div class="c wide">
-        <h2>Reporte de Incidentes por Empresa / Unidad de Negocio</h2>
-        <div class="tw">
-          <table id="loc">
-            <thead>
-              <tr>
-                <th>Empresa / Unidad</th>
-                <th>Total Incidentes</th>
-                <th>P1 (Alta)</th>
-                <th>P2 (Media)</th>
-                <th>P3 (Baja)</th>
-                <th>% Cierre</th>
-                <th>Estado Compliance SLA</th>
-              </tr>
-            </thead>
-            <tbody id="locTableBody">
-              <!-- Cargado por JavaScript -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- VISTA 3: TENDENCIAS -->
-    <div class="view" id="view-2">
-      <div class="c wide">
-        <h2>Evolución Mensual de Incidentes (Enero - Septiembre)</h2>
-        <div class="ch" style="height: 380px;"><canvas id="chartTrend"></canvas></div>
-      </div>
-    </div>
-</main>
-<div class="foot"></div>
-<script>
-    // Datos reales consolidados de la base de datos
-    const rawData = [
-      { name: "Americas Business Service Center", total: 1759, p1: 3, p2: 436, p3: 1320, closed: 1480, sla: "100%" },
-      { name: "Holcim Argentina", total: 610, p1: 1, p2: 152, p3: 457, closed: 512, sla: "100%" },
-      { name: "xLafarge Canada - ECAN", total: 356, p1: 0, p2: 88, p3: 268, closed: 298, sla: "100%" },
-      { name: "Holcim Perú", total: 318, p1: 1, p2: 79, p3: 238, closed: 267, sla: "100%" },
-      { name: "Holcim México", total: 311, p1: 0, p2: 77, p3: 234, closed: 261, sla: "100%" },
-      { name: "Holcim Ecuador", total: 222, p1: 0, p2: 55, p3: 167, closed: 186, sla: "100%" },
-      { name: "Holcim Colombia", total: 212, p1: 1, p2: 53, p3: 158, closed: 178, sla: "100%" },
-      { name: "Holcim Corporate France", total: 123, p1: 0, p2: 30, p3: 93, closed: 103, sla: "100%" },
-      { name: "Holcim El Salvador", total: 111, p1: 0, p2: 28, p3: 83, closed: 93, sla: "100%" },
-      { name: "Americas Digital Center", total: 94, p1: 0, p2: 23, p3: 71, closed: 79, sla: "100%" },
-      { name: "Otros", total: 240, p1: 0, p2: 59, p3: 181, closed: 200, sla: "100%" }
+  </header>
+  <main id="main" class="wrap"></main>
+  <div class="foot"></div>
+  <noscript>Este reporte necesita JavaScript para mostrar los incidentes.</noscript>
+  <script>
+    const PRIORITIES = [
+      { value: "P1", key: "p1", label: "P1 · Alta" },
+      { value: "P2", key: "p2", label: "P2 · Media" },
+      { value: "P3", key: "p3", label: "P3 · Baja" }
     ];
 
-    let chartP, chartC, chartT;
+    const COMPANIES = [
+      { name: "Americas Business Service Center", p1: 3, p2: 436, p3: 1320, closed: 1480, slaOut: 0 },
+      { name: "Holcim Argentina", p1: 1, p2: 152, p3: 457, closed: 512, slaOut: 0 },
+      { name: "xLafarge Canada - ECAN", p1: 0, p2: 88, p3: 268, closed: 298, slaOut: 0 },
+      { name: "Holcim Perú", p1: 1, p2: 79, p3: 238, closed: 267, slaOut: 0 },
+      { name: "Holcim México", p1: 0, p2: 77, p3: 234, closed: 261, slaOut: 0 },
+      { name: "Holcim Ecuador", p1: 0, p2: 55, p3: 167, closed: 186, slaOut: 0 },
+      { name: "Holcim Colombia", p1: 1, p2: 53, p3: 158, closed: 178, slaOut: 0 },
+      { name: "Holcim Corporate France", p1: 0, p2: 30, p3: 93, closed: 103, slaOut: 0 },
+      { name: "Holcim El Salvador", p1: 0, p2: 28, p3: 83, closed: 93, slaOut: 0 },
+      { name: "Americas Digital Center", p1: 0, p2: 23, p3: 71, closed: 79, slaOut: 0 },
+      { name: "Otros", p1: 0, p2: 59, p3: 181, closed: 200, slaOut: 0 }
+    ].map((row) => ({ ...row, total: row.p1 + row.p2 + row.p3, country: countryOf(row.name) }));
 
-    function initCharts() {
-      // Gráfico de Prioridad
-      const ctxP = document.getElementById('chartPriority').getContext('2d');
-      chartP = new Chart(ctxP, {
-        type: 'doughnut',
-        data: {
-          labels: ['P1 - Alta', 'P2 - Media', 'P3 - Baja'],
-          datasets: [{
-            data: [6, 1080, 3270],
-            backgroundColor: ['#e6007e', '#04bbf1', '#1d4370']
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
+    // Cifras del consolidado. No están abiertas por empresa, país ni prioridad.
+    const EXTRAS = { inProgress: 605, reopened: 94, reassignAvg: 0.26 };
+    const MONTHS = [
+      { label: "Ene", value: 553 },
+      { label: "Feb", value: 378 },
+      { label: "Mar", value: 484 },
+      { label: "Abr", value: 457 },
+      { label: "May", value: 437 },
+      { label: "Jun", value: 416 },
+      { label: "Jul", value: 429 },
+      { label: "Ago", value: 406 },
+      { label: "Sep", value: 360 }
+    ];
+    const CATEGORIES = [
+      { label: "Software", value: 863 },
+      { label: "Security", value: 548 },
+      { label: "Finances & Ctrl", value: 355 },
+      { label: "Cloud", value: 297 },
+      { label: "SAP SD", value: 195 },
+      { label: "DataRooms", value: 191 },
+      { label: "SRM", value: 160 },
+      { label: "SAP MM", value: 157 },
+      { label: "Hardware", value: 129 }
+    ];
 
-      // Gráfico de Categorías
-      const ctxC = document.getElementById('chartCategory').getContext('2d');
-      chartC = new Chart(ctxC, {
-        type: 'bar',
-        data: {
-          labels: ['Software', 'Security', 'Finances & Ctrl', 'Cloud', 'SAP SD', 'DataRooms', 'SRM', 'SAP MM', 'Hardware'],
-          datasets: [{
-            label: 'Incidentes',
-            data: [863, 548, 355, 297, 195, 191, 160, 157, 129],
-            backgroundColor: '#1d4370'
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
-      });
-
-      // Gráfico de Tendencia Mensual
-      const ctxT = document.getElementById('chartTrend').getContext('2d');
-      chartT = new Chart(ctxT, {
-        type: 'line',
-        data: {
-          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep'],
-          datasets: [{
-            label: 'Incidentes Mensuales (2024)',
-            data: [553, 378, 484, 457, 437, 416, 429, 406, 360],
-            borderColor: '#04bbf1',
-            backgroundColor: 'rgba(4, 187, 241, 0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 5,
-            pointHoverRadius: 8
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('locTableBody');
-      tbody.innerHTML = '';
-      rawData.forEach(item => {
-        const pct = Math.round((item.closed / item.total) * 100);
-        tbody.innerHTML += `
-          <tr>
-            <td><b>${item.name}</b></td>
-            <td>${item.total.toLocaleString()}</td>
-            <td style="color:${item.p1 > 0 ? 'var(--bad)' : 'inherit'}"><b>${item.p1}</b></td>
-            <td>${item.p2}</td>
-            <td>${item.p3}</td>
-            <td><b>${pct}%</b></td>
-            <td><span style="color:var(--good); font-weight:bold;">100% OK</span></td>
-          </tr>
-        `;
-      });
-    }
-
-    function switchTab(idx) {
-      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-        btn.classList.toggle('on', i === idx);
-      });
-      document.querySelectorAll('.view').forEach((v, i) => {
-        v.classList.toggle('on', i === idx);
-      });
-    }
-
-    function applyFilters() {
-      const selected = document.getElementById('selCompany').value;
-      if (selected === 'ALL') {
-        document.getElementById('kpi-total').innerText = '4,356';
-        document.getElementById('kpi-p1').innerText = '6';
-        document.getElementById('p1-val').innerText = '6';
-        document.getElementById('p2-val').innerText = '1,080';
-        document.getElementById('p3-val').innerText = '3,270';
-        chartP.data.datasets[0].data = [6, 1080, 3270];
-      } else {
-        const match = rawData.find(d => d.name === selected);
-        if (match) {
-          document.getElementById('kpi-total').innerText = match.total.toLocaleString();
-          document.getElementById('kpi-p1').innerText = match.p1;
-          document.getElementById('p1-val').innerText = match.p1;
-          document.getElementById('p2-val').innerText = match.p2;
-          document.getElementById('p3-val').innerText = match.p3;
-          chartP.data.datasets[0].data = [match.p1, match.p2, match.p3];
-        }
-      }
-      chartP.update();
-    }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-    }
-
-    function exportData() {
-      const ws = XLSX.utils.json_to_sheet(rawData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Incidentes");
-      XLSX.writeFile(wb, "Holcim_Reporte_Incidentes.xlsx");
-    }
-
-    window.onload = () => {
-      initCharts();
-      renderTable();
+    const state = {
+      module: "incidents",
+      view: "general",
+      companies: new Set(COMPANIES.map((c) => c.name)),
+      countries: new Set(COMPANIES.map((c) => c.country)),
+      priorities: new Set(PRIORITIES.map((p) => p.value))
     };
+    let charts = [];
+
+    function countryOf(name) {
+      const n = name.toLowerCase();
+      const globalHints = ["ecan", "canada", "corporate france", "emea digital", "filipinas", "philippines", "south asia", "technology and services"];
+      if (globalHints.some((hint) => n.includes(hint))) return "Global";
+      const match = name.match(/^Holcim\s+(.+)$/i);
+      return match ? match[1] : name;
+    }
+
+    function esc(value) {
+      return String(value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    }
+
+    function norm(value) {
+      return value.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+    }
+
+    const num = new Intl.NumberFormat("es-CO");
+    const pctFmt = new Intl.NumberFormat("es-CO", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const decFmt = new Intl.NumberFormat("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function fmt(value) { return num.format(value); }
+    function pct(ratio) { return ratio == null ? "—" : pctFmt.format(ratio); }
+
+    function selection() {
+      const allPriorities = state.priorities.size === PRIORITIES.length;
+      const rows = COMPANIES.filter((c) => state.companies.has(c.name) && state.countries.has(c.country)).map((c) => {
+        const shaped = { name: c.name, country: c.country, p1: 0, p2: 0, p3: 0 };
+        if (state.priorities.has("P1")) shaped.p1 = c.p1;
+        if (state.priorities.has("P2")) shaped.p2 = c.p2;
+        if (state.priorities.has("P3")) shaped.p3 = c.p3;
+        shaped.total = shaped.p1 + shaped.p2 + shaped.p3;
+        shaped.closed = allPriorities ? c.closed : null;
+        shaped.slaOut = allPriorities ? c.slaOut : null;
+        return shaped;
+      });
+      return {
+        rows,
+        allPriorities,
+        full: allPriorities && rows.length === COMPANIES.length,
+        totals: sumRows(rows, allPriorities)
+      };
+    }
+
+    function sumRows(rows, allPriorities) {
+      const totals = { total: 0, p1: 0, p2: 0, p3: 0, closed: allPriorities ? 0 : null, slaOut: allPriorities ? 0 : null };
+      rows.forEach((row) => {
+        totals.total += row.total;
+        totals.p1 += row.p1;
+        totals.p2 += row.p2;
+        totals.p3 += row.p3;
+        if (allPriorities) {
+          totals.closed += row.closed;
+          totals.slaOut += row.slaOut;
+        }
+      });
+      return totals;
+    }
+
+    function byCountry(rows, allPriorities) {
+      const groups = new Map();
+      rows.forEach((row) => {
+        if (!groups.has(row.country)) groups.set(row.country, []);
+        groups.get(row.country).push(row);
+      });
+      return [...groups.entries()].map(([country, list]) => ({
+        country,
+        companies: list.length,
+        ...sumRows(list, allPriorities)
+      })).sort((a, b) => b.total - a.total || a.country.localeCompare(b.country, "es"));
+    }
+
+    function closeRatio(totals) {
+      if (totals.closed == null || totals.total === 0) return null;
+      return totals.closed / totals.total;
+    }
+
+    function slaRatio(totals) {
+      if (totals.closed == null || totals.closed === 0) return null;
+      return 1 - totals.slaOut / totals.closed;
+    }
+
+    function slaClass(ratio) {
+      if (ratio == null) return "na";
+      if (ratio >= 0.95) return "ok";
+      if (ratio >= 0.8) return "mid";
+      return "bad";
+    }
+
+    function mixBar(row) {
+      if (!row.total) return '<div class="mix"></div>';
+      return `<div class="mix" title="P1 ${fmt(row.p1)} · P2 ${fmt(row.p2)} · P3 ${fmt(row.p3)}">
+        <i class="p1" style="width:${(row.p1 / row.total) * 100}%"></i>
+        <i class="p2" style="width:${(row.p2 / row.total) * 100}%"></i>
+        <i class="p3" style="width:${(row.p3 / row.total) * 100}%"></i>
+      </div>`;
+    }
+
+    function slaCell(totals) {
+      const ratio = slaRatio(totals);
+      const out = totals.slaOut == null ? "—" : fmt(totals.slaOut);
+      const outClass = totals.slaOut > 0 ? "breach" : "";
+      return `<td class="${outClass}">${out}</td><td class="sem sem-${slaClass(ratio)}">${pct(ratio)}</td>`;
+    }
+
+    function scopeLine(sel) {
+      const chosen = PRIORITIES.filter((p) => state.priorities.has(p.value)).map((p) => p.value);
+      const prio = chosen.length === PRIORITIES.length ? "todas las prioridades" : (chosen.length ? chosen.join(", ") : "sin prioridades");
+      let who = `${sel.rows.length} empresas`;
+      if (sel.rows.length === COMPANIES.length) who = "todas las empresas";
+      else if (sel.rows.length === 0) who = "ninguna empresa";
+      else if (sel.rows.length <= 2) who = sel.rows.map((row) => row.name).join(" · ");
+      return `${fmt(sel.totals.total)} incidentes · ${who} · ${prio}`;
+    }
+
+    function kpi(value, label, tone, detail) {
+      return `<article class="kpi tone-${tone}"><b>${value}</b><span>${esc(label)}</span>${detail ? `<small>${detail}</small>` : ""}</article>`;
+    }
+
+    function kpis(sel) {
+      const tone = slaClass(slaRatio(sel.totals));
+      const slaDetail = sel.allPriorities
+        ? `<small class="${sel.totals.slaOut > 0 ? "breach" : ""}">${fmt(sel.totals.slaOut)} fuera de SLA</small>`
+        : "<small>No está abierto por prioridad</small>";
+      const reopen = sel.full ? pct(EXTRAS.reopened / COMPANIES.reduce((sum, row) => sum + row.total, 0)) : "—";
+      return `<section class="kpis">
+        ${kpi(fmt(sel.totals.total), "Incidentes", "navy")}
+        <article class="kpi tone-${tone === "na" ? "navy" : tone}"><b>${pct(slaRatio(sel.totals))}</b><span>Cumplimiento SLA</span>${slaDetail}</article>
+        ${kpi(pct(closeRatio(sel.totals)), "Tasa de cierre", "green", sel.allPriorities ? "" : "No está abierta por prioridad")}
+        ${kpi(fmt(sel.totals.p1), "Incidentes P1", sel.totals.p1 ? "hot" : "navy")}
+        ${kpi(reopen, "Tasa de reapertura", "navy", sel.full ? "" : "Disponible en el consolidado")}
+      </section>`;
+    }
+
+    function caveats(sel) {
+      const notes = [];
+      if (!sel.allPriorities) notes.push("Cierre y SLA usan los incidentes cerrados y no están abiertos por prioridad.");
+      if (!sel.full) notes.push("Reapertura, reasignaciones, categorías y la serie mensual están cargadas solo para el consolidado.");
+      return notes.length ? `<p class="note">${notes.join(" ")}</p>` : "";
+    }
+
+    function generalView(sel) {
+      const closed = sel.allPriorities ? fmt(sel.totals.closed) : "—";
+      const progress = sel.full ? fmt(EXTRAS.inProgress) : "—";
+      const reopened = sel.full ? fmt(EXTRAS.reopened) : "—";
+      const reassign = sel.full ? decFmt.format(EXTRAS.reassignAvg) : "—";
+      const chartsHtml = sel.rows.length ? `<section class="grid">
+        <article class="card"><h2>Incidentes por prioridad</h2><div class="chart"><canvas id="chartPriority"></canvas></div></article>
+        <article class="card"><h2>Top categorías de servicio</h2>
+          ${sel.full ? '<div class="chart"><canvas id="chartCategory"></canvas></div><p class="note">Top categorías cargadas. No suman el total de incidentes.</p>' : '<p class="empty-inline">El detalle por categoría está cargado solo para el consolidado.</p>'}
+        </article>
+      </section>` : '<p class="empty-inline">Ninguna empresa coincide con los filtros.</p>';
+      return `${kpis(sel)}
+        <section class="cards2">
+          <article class="card">
+            <h2>Distribución por prioridad</h2>
+            <div class="statgrid">
+              <div><b class="${sel.totals.p1 ? "hot" : ""}">${fmt(sel.totals.p1)}</b><span>P1 · Alta</span></div>
+              <div><b>${fmt(sel.totals.p2)}</b><span>P2 · Media</span></div>
+              <div><b>${fmt(sel.totals.p3)}</b><span>P3 · Baja</span></div>
+              <div><b>${reassign}</b><span>Reasignaciones prom.</span></div>
+            </div>
+          </article>
+          <article class="card">
+            <h2>Desempeño y resolución</h2>
+            <div class="statgrid">
+              <div><b>${closed}</b><span>Cerrados</span></div>
+              <div><b>${progress}</b><span>En progreso</span></div>
+              <div><b>${reopened}</b><span>Reabiertos</span></div>
+              <div><b class="sem sem-${slaClass(slaRatio(sel.totals))}">${pct(slaRatio(sel.totals))}</b><span>SLA</span></div>
+            </div>
+          </article>
+        </section>
+        ${chartsHtml}
+        ${caveats(sel)}`;
+    }
+
+    function countryTable(groups) {
+      if (!groups.length) return '<p class="empty-inline">Ninguna empresa coincide con los filtros.</p>';
+      const body = groups.map((row) => `<tr>
+        <td>${esc(row.country)}</td>
+        <td>${fmt(row.companies)}</td>
+        <td>${fmt(row.total)}</td>
+        <td>${row.closed == null ? "—" : fmt(row.closed)}</td>
+        <td>${pct(closeRatio(row))}</td>
+        ${slaCell(row)}
+        <td>${fmt(row.p1)}</td>
+        <td>${mixBar(row)}</td>
+      </tr>`).join("");
+      return `<div class="tw"><table>
+        <thead><tr>
+          <th>País</th><th>Empresas</th><th>Incidentes</th><th>Cerrados</th><th>% cierre</th>
+          <th>Fuera de SLA</th><th title="1 − (cerrados fuera de SLA ÷ cerrados)">Cumplimiento SLA</th>
+          <th>P1</th><th>Mezcla</th>
+        </tr></thead>
+        <tbody>${body}</tbody>
+      </table></div>`;
+    }
+
+    function companyTable(rows) {
+      const list = [...rows].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, "es"));
+      if (!list.length) return "";
+      const body = list.map((row) => `<tr>
+        <td>${esc(row.name)}</td>
+        <td>${esc(row.country)}</td>
+        <td>${fmt(row.total)}</td>
+        <td>${row.closed == null ? "—" : fmt(row.closed)}</td>
+        <td>${pct(closeRatio(row))}</td>
+        ${slaCell(row)}
+        <td>${fmt(row.p1)}</td>
+        <td>${fmt(row.p2)}</td>
+        <td>${fmt(row.p3)}</td>
+      </tr>`).join("");
+      return `<div class="tw"><table>
+        <thead><tr>
+          <th>Empresa</th><th>País</th><th>Incidentes</th><th>Cerrados</th><th>% cierre</th>
+          <th>Fuera de SLA</th><th>Cumplimiento SLA</th><th>P1</th><th>P2</th><th>P3</th>
+        </tr></thead>
+        <tbody>${body}</tbody>
+      </table></div>`;
+    }
+
+    function countryView(sel) {
+      const groups = byCountry(sel.rows, sel.allPriorities);
+      const chart = groups.length ? '<article class="card"><h2>Incidentes por país</h2><div class="chart" id="countryChartBox"><canvas id="chartCountry"></canvas></div></article>' : "";
+      return `<section class="grid">
+          ${chart}
+          <article class="card">
+            <h2>Cómo se lee el SLA</h2>
+            <p class="note">Un incidente incumplido es el que llega con Out of SLA en verdadero. En esta vista el cumplimiento es 1 − (cerrados fuera de SLA ÷ cerrados). Canadá ECAN y Corporate France se reportan en Global.</p>
+            <ul class="legend">
+              <li><i class="dot ok"></i> 95% o más</li>
+              <li><i class="dot mid"></i> de 80% a menos de 95%</li>
+              <li><i class="dot bad"></i> menos de 80%</li>
+              <li><i class="dot breach"></i> incumplimientos, en fucsia</li>
+            </ul>
+          </article>
+        </section>
+        <article class="card"><h2>Data por país</h2>${countryTable(groups)}</article>
+        ${sel.rows.length ? `<article class="card"><h2>Detalle por empresa</h2>${companyTable(sel.rows)}</article>` : ""}
+        ${caveats(sel)}`;
+    }
+
+    function teamView() {
+      return `<article class="card empty-state">
+        <p class="eyebrow">Data por team</p>
+        <h2>Sin datos cargados</h2>
+        <p class="note">Esta vista espera el export de ServiceNow. El corte por team no está en los datos actuales.</p>
+      </article>`;
+    }
+
+    function ytdView(sel) {
+      const groups = byCountry(sel.rows, sel.allPriorities);
+      const monthSum = MONTHS.reduce((sum, month) => sum + month.value, 0);
+      const series = sel.full ? `<article class="card">
+          <h2>Acumulado de la serie mensual</h2>
+          <div class="chart tall"><canvas id="chartYtd"></canvas></div>
+          <p class="note">La serie mensual suma ${fmt(monthSum)} incidentes. El total por empresa es ${fmt(COMPANIES.reduce((sum, row) => sum + row.total, 0))}; la diferencia no está abierta por mes.</p>
+        </article>` : `<article class="card"><p class="empty-inline">La serie mensual está cargada solo para el consolidado.</p></article>`;
+      return `${kpis(sel)}
+        <article class="card"><h2>Ranking por país</h2><div class="chart" id="ytdChartBox"><canvas id="chartYtdCountry"></canvas></div></article>
+        <article class="card"><h2>Cumplimiento por país</h2>${countryTable(groups)}</article>
+        ${series}
+        ${caveats(sel)}`;
+    }
+
+    function trendView(sel) {
+      if (!sel.full) {
+        return `<article class="card empty-state">
+          <p class="eyebrow">Tendencias</p>
+          <h2>Serie mensual del consolidado</h2>
+          <p class="note">La evolución por mes está cargada solo para el total, sin corte por empresa, país o prioridad. Restablece los filtros para verla.</p>
+        </article>`;
+      }
+      let running = 0;
+      const monthSum = MONTHS.reduce((sum, month) => sum + month.value, 0);
+      const body = MONTHS.map((month) => {
+        running += month.value;
+        return `<tr><td>${month.label}</td><td>${fmt(month.value)}</td><td>${fmt(running)}</td></tr>`;
+      }).join("");
+      return `<article class="card">
+          <h2>Evolución mensual de incidentes</h2>
+          <div class="chart tall"><canvas id="chartTrend"></canvas></div>
+          <p class="note">Enero a septiembre. La serie suma ${fmt(monthSum)} incidentes y el total por empresa es ${fmt(COMPANIES.reduce((sum, row) => sum + row.total, 0))}.</p>
+        </article>
+        <article class="card"><h2>Detalle mensual</h2>
+          <div class="tw"><table><thead><tr><th>Mes</th><th>Incidentes</th><th>Acumulado</th></tr></thead><tbody>${body}</tbody></table></div>
+        </article>`;
+    }
+
+    function emptyModule(name) {
+      return `<article class="card empty-state">
+        <p class="eyebrow">${esc(name)}</p>
+        <h2>Sin datos cargados</h2>
+        <p class="note">Esta sección espera el export de ServiceNow.</p>
+      </article>`;
+    }
+
+    function renderMain() {
+      const root = document.getElementById("main");
+      if (state.module !== "incidents") {
+        root.innerHTML = emptyModule(state.module === "request" ? "Request" : "Changes");
+        return;
+      }
+      const sel = selection();
+      const views = { general: generalView, country: countryView, team: teamView, ytd: ytdView, trend: trendView };
+      root.innerHTML = `<p class="summary">${esc(scopeLine(sel))}</p>${views[state.view](sel)}`;
+    }
+
+    function chartLabel(name) {
+      if (name === "Americas Business Service Center") return "Americas BSC";
+      if (name === "Americas Digital Center") return "Americas Digital";
+      return name;
+    }
+
+    function chartTip(ctx) {
+      const value = typeof ctx.parsed === "number" ? ctx.parsed : (ctx.parsed.x ?? ctx.parsed.y);
+      const label = Array.isArray(ctx.label) ? ctx.label.join(" ") : ctx.label;
+      return `${label}: ${fmt(value)}`;
+    }
+
+    function renderCharts() {
+      if (typeof Chart === "undefined") {
+        document.querySelectorAll(".chart").forEach((box) => {
+          box.innerHTML = '<p class="empty-inline">No se pudo cargar la gráfica.</p>';
+        });
+        return;
+      }
+      const sel = selection();
+      const groups = byCountry(sel.rows, sel.allPriorities);
+      const tip = { plugins: { tooltip: { callbacks: { label: chartTip } } } };
+      const axis = {
+        x: { grid: { color: "#eef2f5" }, ticks: { precision: 0, callback: (value) => fmt(value) } },
+        y: { grid: { display: false } }
+      };
+      if (document.getElementById("chartPriority")) {
+        charts.push(new Chart(document.getElementById("chartPriority"), {
+          type: "doughnut",
+          data: {
+            labels: ["P1 · Alta", "P2 · Media", "P3 · Baja"],
+            datasets: [{ data: [sel.totals.p1, sel.totals.p2, sel.totals.p3], backgroundColor: ["#e6007e", "#04bbf1", "#1d4370"], borderWidth: 0 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, cutout: "68%", plugins: { legend: { position: "bottom" }, tooltip: tip.plugins.tooltip } }
+        }));
+      }
+      if (document.getElementById("chartCategory")) {
+        charts.push(new Chart(document.getElementById("chartCategory"), {
+          type: "bar",
+          data: { labels: CATEGORIES.map((row) => row.label), datasets: [{ data: CATEGORIES.map((row) => row.value), backgroundColor: "#1d4370", borderRadius: 4 }] },
+          options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, ...tip.plugins }, scales: axis }
+        }));
+      }
+      const countryCanvas = document.getElementById("chartCountry") || document.getElementById("chartYtdCountry");
+      if (countryCanvas && groups.length) {
+        const labels = groups.map((row) => chartLabel(row.country));
+        countryCanvas.parentElement.style.height = Math.max(220, groups.length * 34) + "px";
+        charts.push(new Chart(countryCanvas, {
+          type: "bar",
+          data: { labels, datasets: [{ data: groups.map((row) => row.total), backgroundColor: "#1d4370", borderRadius: 4 }] },
+          options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false }, ...tip.plugins }, scales: axis }
+        }));
+      }
+      if (document.getElementById("chartTrend") || document.getElementById("chartYtd")) {
+        const canvas = document.getElementById("chartTrend") || document.getElementById("chartYtd");
+        let running = 0;
+        const cumulative = MONTHS.map((month) => (running += month.value));
+        charts.push(new Chart(canvas, {
+          type: "bar",
+          data: {
+            labels: MONTHS.map((month) => month.label),
+            datasets: [
+              { type: "bar", label: "Mes", data: MONTHS.map((month) => month.value), backgroundColor: "#1d4370", borderRadius: 4, yAxisID: "y" },
+              { type: "line", label: "Acumulado", data: cumulative, borderColor: "#04bbf1", backgroundColor: "#04bbf1", tension: 0.25, pointRadius: 4, yAxisID: "y1" }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } } },
+            scales: {
+              y: { position: "left", ticks: { callback: (value) => fmt(value) }, grid: { color: "#eef2f5" } },
+              y1: { position: "right", ticks: { callback: (value) => fmt(value) }, grid: { drawOnChartArea: false } }
+            }
+          }
+        }));
+      }
+    }
+
+    function clearCharts() {
+      charts.forEach((chart) => chart.destroy());
+      charts = [];
+    }
+
+    function companyCount(company) {
+      let count = 0;
+      if (state.priorities.has("P1")) count += company.p1;
+      if (state.priorities.has("P2")) count += company.p2;
+      if (state.priorities.has("P3")) count += company.p3;
+      return count;
+    }
+
+    function countryCount(country) {
+      return COMPANIES.filter((company) => company.country === country).reduce((sum, company) => sum + companyCount(company), 0);
+    }
+
+    function priorityCount(key) {
+      return COMPANIES
+        .filter((company) => state.companies.has(company.name) && state.countries.has(company.country))
+        .reduce((sum, company) => sum + company[key], 0);
+    }
+
+    function mountMulti(rootId, config) {
+      const root = document.getElementById(rootId);
+      root.className = "ms";
+      root.innerHTML = `<button type="button" class="ms-btn" aria-expanded="false" aria-haspopup="listbox">
+          <span><span class="ms-k">${esc(config.label)}</span><span class="ms-v" data-v></span></span>
+          <span class="chev" aria-hidden="true">▾</span>
+        </button>
+        <div class="ms-panel">
+          <input class="ms-search" type="search" placeholder="${esc(config.placeholder)}" aria-label="${esc(config.placeholder)}">
+          <div class="ms-meta" data-meta></div>
+          <label class="ms-row"><input type="checkbox" data-master><span>Seleccionar todas</span></label>
+          <div class="ms-list" data-list></div>
+          <div class="none" data-empty hidden>Sin coincidencias</div>
+        </div>`;
+      const list = root.querySelector("[data-list]");
+      list.innerHTML = config.options.map((option, index) => `<div class="ms-row" data-opt data-label="${esc(norm(option.search || option.label))}">
+          <input id="${rootId}-${index}" type="checkbox" value="${esc(option.value)}">
+          <label class="nm" for="${rootId}-${index}">${esc(option.label)}</label>
+          <span class="cnt" data-cnt="${esc(option.value)}"></span>
+          <button type="button" class="solo" data-solo="${esc(option.value)}">SOLO</button>
+        </div>`).join("");
+      root.querySelector(".ms-btn").addEventListener("click", () => {
+        const open = !root.classList.contains("open");
+        closeMenus();
+        if (open) {
+          root.classList.add("open");
+          root.querySelector(".ms-btn").setAttribute("aria-expanded", "true");
+          root.querySelector(".ms-search").focus();
+        }
+      });
+      root.querySelector(".ms-search").addEventListener("input", (event) => {
+        const query = norm(event.target.value.trim());
+        let visible = 0;
+        list.querySelectorAll("[data-opt]").forEach((row) => {
+          const show = !query || row.dataset.label.includes(query);
+          row.hidden = !show;
+          if (show) visible += 1;
+        });
+        root.querySelector("[data-empty]").hidden = visible !== 0;
+      });
+      root.querySelector("[data-master]").addEventListener("change", (event) => {
+        const query = norm(root.querySelector(".ms-search").value.trim());
+        const visible = config.options.filter((option) => !query || norm(option.search || option.label).includes(query));
+        visible.forEach((option) => {
+          if (event.target.checked) config.selected().add(option.value);
+          else config.selected().delete(option.value);
+        });
+        apply();
+      });
+      list.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          if (input.checked) config.selected().add(input.value);
+          else config.selected().delete(input.value);
+          apply();
+        });
+      });
+      list.querySelectorAll("[data-solo]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          config.onSolo(button.dataset.solo);
+          closeMenus();
+        });
+      });
+    }
+
+    function syncMulti(rootId, selected, counts) {
+      const root = document.getElementById(rootId);
+      const inputs = [...root.querySelectorAll("[data-opt] input")];
+      inputs.forEach((input) => { input.checked = selected.has(input.value); });
+      root.querySelectorAll("[data-cnt]").forEach((node) => { node.textContent = fmt(counts.get(node.dataset.cnt) || 0); });
+      const checked = inputs.filter((input) => input.checked).length;
+      const master = root.querySelector("[data-master]");
+      master.checked = inputs.length > 0 && checked === inputs.length;
+      master.indeterminate = checked > 0 && checked < inputs.length;
+      root.querySelector("[data-v]").textContent = `${checked} de ${inputs.length}`;
+      root.querySelector("[data-meta]").textContent = `${checked} de ${inputs.length} seleccionadas`;
+    }
+
+    function updateFilters() {
+      syncMulti("ms-company", state.companies, new Map(COMPANIES.map((company) => [company.name, companyCount(company)])));
+      const allCountries = [...new Set(COMPANIES.map((company) => company.country))];
+      syncMulti("ms-country", state.countries, new Map(allCountries.map((country) => [country, countryCount(country)])));
+      syncMulti("ms-priority", state.priorities, new Map(PRIORITIES.map((priority) => [priority.value, priorityCount(priority.key)])));
+      document.querySelectorAll("#ms-company [data-opt]").forEach((row) => {
+        const company = COMPANIES.find((item) => item.name === row.querySelector("input").value);
+        row.style.opacity = state.countries.has(company.country) ? "1" : "0.45";
+      });
+    }
+
+    function closeMenus() {
+      document.querySelectorAll(".ms.open").forEach((node) => {
+        node.classList.remove("open");
+        node.querySelector(".ms-btn").setAttribute("aria-expanded", "false");
+      });
+    }
+
+    function resetFilters() {
+      state.companies = new Set(COMPANIES.map((company) => company.name));
+      state.countries = new Set(COMPANIES.map((company) => company.country));
+      state.priorities = new Set(PRIORITIES.map((priority) => priority.value));
+      apply();
+    }
+
+    function soloCompany(name) {
+      const company = COMPANIES.find((row) => row.name === name);
+      state.companies = new Set([name]);
+      state.countries = new Set([company.country]);
+      apply();
+    }
+
+    function soloCountry(country) {
+      state.countries = new Set([country]);
+      state.companies = new Set(COMPANIES.filter((company) => company.country === country).map((company) => company.name));
+      apply();
+    }
+
+    function soloPriority(priority) {
+      state.priorities = new Set([priority]);
+      apply();
+    }
+
+    function apply() {
+      document.body.dataset.module = state.module;
+      document.querySelectorAll("header [data-module]").forEach((button) => {
+        const on = button.dataset.module === state.module;
+        button.classList.toggle("on", on);
+        button.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.querySelectorAll("header [data-view]").forEach((button) => {
+        const on = button.dataset.view === state.view;
+        button.classList.toggle("on", on);
+        button.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      updateFilters();
+      clearCharts();
+      renderMain();
+      if (state.module === "incidents") renderCharts();
+    }
+
+    function pptCell(text, options) {
+      return { text: String(text), options: { fontFace: "Montserrat", fontSize: 11, color: "17262F", align: "center", valign: "middle", ...(options || {}) } };
+    }
+
+    function pptHead(text) {
+      return pptCell(text, { fill: { color: "041739" }, color: "FFFFFF", bold: true, align: "center" });
+    }
+
+    function addBand(slide) {
+      slide.addShape("rect", { x: 0, y: 0, w: 13.3, h: 0.1, fill: { color: "94C12E" } });
+      slide.addShape("rect", { x: 0, y: 0.1, w: 13.3, h: 0.06, fill: { color: "04BBF1" } });
+    }
+
+    function addSlideTitle(slide, title) {
+      addBand(slide);
+      slide.addText("LA - Monthly Operations Report", { x: 0.45, y: 0.28, w: 8, h: 0.28, fontFace: "Montserrat", fontSize: 11, color: "1D4370", bold: true });
+      slide.addText(title, { x: 0.45, y: 0.54, w: 12, h: 0.38, fontFace: "Montserrat", fontSize: 22, color: "041739", bold: true });
+    }
+
+    async function exportPpt() {
+      if (typeof PptxGenJS === "undefined") {
+        alert("No se pudo cargar la exportación a PowerPoint.");
+        return;
+      }
+      const button = document.getElementById("export");
+      button.disabled = true;
+      try {
+        const sel = selection();
+        const pptx = new PptxGenJS();
+        pptx.layout = "LAYOUT_WIDE";
+        pptx.title = "LA - Monthly Operations Report";
+        pptx.author = "LA Monthly Operations Report";
+        pptx.subject = "Incidentes";
+
+        const cover = pptx.addSlide();
+        cover.addShape("rect", { x: 0, y: 0, w: 13.3, h: 7.5, fill: { color: "041739" } });
+        cover.addShape("rect", { x: 0, y: 0, w: 0.18, h: 7.5, fill: { color: "94C12E" } });
+        cover.addText("HOLCIM", { x: 0.8, y: 1.8, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 14, color: "94C12E", bold: true, charSpacing: 2 });
+        cover.addText("LA - Monthly Operations Report", { x: 0.8, y: 2.25, w: 11, h: 0.7, fontFace: "Montserrat", fontSize: 32, color: "FFFFFF", bold: true });
+        cover.addText("Incidentes · enero a septiembre", { x: 0.8, y: 3.1, w: 10, h: 0.35, fontFace: "Montserrat", fontSize: 16, color: "04BBF1" });
+        cover.addText(scopeLine(sel), { x: 0.8, y: 3.7, w: 11, h: 0.4, fontFace: "Montserrat", fontSize: 14, color: "FFFFFF" });
+        cover.addText("Request y Changes: sin datos cargados", { x: 0.8, y: 6.6, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 12, color: "FFFFFF" });
+
+        const indicators = pptx.addSlide();
+        addSlideTitle(indicators, "Indicadores");
+        const sla = slaRatio(sel.totals);
+        indicators.addTable([
+          [pptHead("Indicador"), pptHead("Valor")],
+          [pptCell("Incidentes", { align: "left" }), pptCell(fmt(sel.totals.total))],
+          [pptCell("P1 · Alta", { align: "left" }), pptCell(fmt(sel.totals.p1))],
+          [pptCell("P2 · Media", { align: "left" }), pptCell(fmt(sel.totals.p2))],
+          [pptCell("P3 · Baja", { align: "left" }), pptCell(fmt(sel.totals.p3))],
+          [pptCell("Cerrados", { align: "left" }), pptCell(sel.allPriorities ? fmt(sel.totals.closed) : "—")],
+          [pptCell("Tasa de cierre", { align: "left" }), pptCell(pct(closeRatio(sel.totals)))],
+          [pptCell("Fuera de SLA", { align: "left" }), pptCell(sel.allPriorities ? fmt(sel.totals.slaOut) : "—", sel.totals.slaOut > 0 ? { color: "E6007E", bold: true } : {})],
+          [pptCell("Cumplimiento SLA", { align: "left" }), pptCell(pct(sla), { color: slaClass(sla) === "ok" ? "04BBF1" : slaClass(sla) === "mid" ? "D99A00" : slaClass(sla) === "bad" ? "D8452B" : "17262F", bold: true })]
+        ], { x: 0.45, y: 1.2, w: 12.3, colW: [7.3, 5], border: [{ pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }] });
+
+        const countries = pptx.addSlide();
+        addSlideTitle(countries, "Data por país");
+        const groups = byCountry(sel.rows, sel.allPriorities);
+        countries.addTable([
+          [pptHead("País"), pptHead("Incidentes"), pptHead("Cerrados"), pptHead("% cierre"), pptHead("Fuera de SLA"), pptHead("SLA"), pptHead("P1")].concat(),
+          ...groups.map((row) => [
+            pptCell(row.country, { align: "left" }),
+            pptCell(fmt(row.total)),
+            pptCell(row.closed == null ? "—" : fmt(row.closed)),
+            pptCell(pct(closeRatio(row))),
+            pptCell(row.slaOut == null ? "—" : fmt(row.slaOut), row.slaOut > 0 ? { color: "E6007E", bold: true } : {}),
+            pptCell(pct(slaRatio(row)), { bold: true }),
+            pptCell(fmt(row.p1))
+          ])
+        ], { x: 0.45, y: 1.2, w: 12.3, colW: [3.2, 1.5, 1.5, 1.5, 1.7, 1.5, 1.4], border: [{ pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }] });
+
+        if (sel.full) {
+          const trend = pptx.addSlide();
+          addSlideTitle(trend, "Tendencias");
+          let running = 0;
+          trend.addTable([
+            [pptHead("Mes"), pptHead("Incidentes"), pptHead("Acumulado")],
+            ...MONTHS.map((month) => {
+              running += month.value;
+              return [pptCell(month.label, { align: "left" }), pptCell(fmt(month.value)), pptCell(fmt(running))];
+            })
+          ], { x: 0.45, y: 1.15, w: 8.2, colW: [2.2, 3, 3], border: [{ pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }, { pt: 0.4, color: "DDE3EA" }] });
+        }
+
+        await pptx.writeFile({ fileName: "LA-Monthly-Operations-Report.pptx" });
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo generar el PowerPoint.");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function mountFilters() {
+      const countries = [...new Set(COMPANIES.map((company) => company.country))].sort((a, b) => a.localeCompare(b, "es"));
+      mountMulti("ms-company", {
+        label: "Empresa",
+        placeholder: "Buscar empresa",
+        options: COMPANIES.map((company) => ({ value: company.name, label: company.name, search: `${company.name} ${company.country}` })),
+        selected: () => state.companies,
+        onSolo: soloCompany
+      });
+      mountMulti("ms-country", {
+        label: "País",
+        placeholder: "Buscar país",
+        options: countries.map((country) => ({ value: country, label: country })),
+        selected: () => state.countries,
+        onSolo: soloCountry
+      });
+      mountMulti("ms-priority", {
+        label: "Prioridad",
+        placeholder: "Buscar prioridad",
+        options: PRIORITIES.map((priority) => ({ value: priority.value, label: priority.label })),
+        selected: () => state.priorities,
+        onSolo: soloPriority
+      });
+    }
+
+    if (typeof Chart !== "undefined") {
+      Chart.defaults.font.family = "Montserrat, sans-serif";
+      Chart.defaults.color = "#5c7080";
+      Chart.defaults.animation = false;
+    }
+
+    document.querySelectorAll("header [data-module]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.module = button.dataset.module;
+        apply();
+      });
+    });
+    document.querySelectorAll("header [data-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.view = button.dataset.view;
+        apply();
+      });
+    });
+    document.getElementById("reset").addEventListener("click", resetFilters);
+    document.getElementById("export").addEventListener("click", exportPpt);
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".ms")) closeMenus();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenus();
+    });
+
+    COMPANIES.forEach((company) => {
+      if (company.p1 + company.p2 + company.p3 !== company.total) console.error("El total no cuadra", company.name);
+    });
+
+    mountFilters();
+    apply();
   </script>
 </body>
 </html>
