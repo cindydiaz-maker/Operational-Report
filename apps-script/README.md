@@ -17,7 +17,7 @@ En Apps Script el HTML vive dentro del proyecto. Cuando alguien abre la direcci�
 2. Apps Script entrega `Index.html` al navegador.
 3. La página llama a `getReport()`. Esa llamada va a `Code.gs`.
 4. `Code.gs` lee las credenciales de las propiedades del script y consulta la API de ServiceNow.
-5. ServiceNow devuelve conteos.
+5. ServiceNow devuelve el mismo total que la lista (`X-Total-Count`), no el conteo del API de estadísticas. Ese API no respeta los bloques `^NQ` y por eso el número no coincidía con el export.
 6. El navegador recibe solo totales y los pinta.
 
 La clave y el detalle de cada registro no salen del servidor.
@@ -32,7 +32,7 @@ Se configuran en Apps Script, **Configuración del proyecto → Propiedades de s
 | `SN_USER` | Usuario de integración con permiso de solo lectura. |
 | `SN_PASSWORD` | Clave de ese usuario. |
 | `SN_QUERY_INCIDENTS` | Query codificado de la tabla `incident`. |
-| `SN_QUERY_REQUEST` | Query codificado de la tabla `sc_request`. |
+| `SN_QUERY_REQUEST` | Query codificado de la tabla `sc_task`. El reporte LA de Request se cuenta sobre task, que es lo que se baja de ServiceNow. |
 | `SN_QUERY_CHANGES` | Query codificado de la tabla `change_request`. |
 
 Los queries se guardan como propiedades, no en el código, porque el repositorio es público y los queries llevan identificadores internos de ServiceNow. Un módulo sin query aparece como "Sin query" y no rompe a los demás.

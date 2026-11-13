@@ -263,7 +263,7 @@
         <div>
           <div class="brand">HOLCIM</div>
           <h1>LA - Monthly Operations Report</h1>
-          <p class="sub">Incidentes · enero a septiembre</p>
+          <p class="sub">Incidentes cerrados · enero a septiembre 2026</p>
         </div>
         <button id="export" class="export" type="button">Exportar a PowerPoint</button>
       </div>
@@ -301,44 +301,39 @@
       { value: "P3", key: "p3", label: "P3 · Baja" }
     ];
 
+    // Incidentes cerrados de enero a septiembre 2026, tomados del export
+    // directo ADC LA - Incidents General Report. Fuera de SLA = Breached Yes.
+    // El total por empresa y la serie mensual son el mismo corte.
     const COMPANIES = [
-      { name: "Americas Business Service Center", p1: 3, p2: 436, p3: 1320, closed: 1480, slaOut: 0 },
-      { name: "Holcim Argentina", p1: 1, p2: 152, p3: 457, closed: 512, slaOut: 0 },
-      { name: "xLafarge Canada - ECAN", p1: 0, p2: 88, p3: 268, closed: 298, slaOut: 0 },
-      { name: "Holcim Perú", p1: 1, p2: 79, p3: 238, closed: 267, slaOut: 0 },
-      { name: "Holcim México", p1: 0, p2: 77, p3: 234, closed: 261, slaOut: 0 },
-      { name: "Holcim Ecuador", p1: 0, p2: 55, p3: 167, closed: 186, slaOut: 0 },
-      { name: "Holcim Colombia", p1: 1, p2: 53, p3: 158, closed: 178, slaOut: 0 },
-      { name: "Holcim Corporate France", p1: 0, p2: 30, p3: 93, closed: 103, slaOut: 0 },
-      { name: "Holcim El Salvador", p1: 0, p2: 28, p3: 83, closed: 93, slaOut: 0 },
-      { name: "Americas Digital Center", p1: 0, p2: 23, p3: 71, closed: 79, slaOut: 0 },
-      { name: "Otros", p1: 0, p2: 59, p3: 181, closed: 200, slaOut: 0 }
+      { name: "Americas Business Service Center", p1: 5, p2: 340, p3: 1392, closed: 1737, slaOut: 16 },
+      { name: "Americas Digital Center", p1: 0, p2: 172, p3: 762, closed: 934, slaOut: 36 },
+      { name: "Holcim Argentina", p1: 1, p2: 259, p3: 343, closed: 603, slaOut: 2 },
+      { name: "Holcim Perú", p1: 0, p2: 39, p3: 293, closed: 332, slaOut: 3 },
+      { name: "Holcim Ecuador", p1: 0, p2: 80, p3: 139, closed: 219, slaOut: 1 },
+      { name: "Holcim Colombia", p1: 0, p2: 79, p3: 125, closed: 204, slaOut: 2 },
+      { name: "Holcim El Salvador", p1: 0, p2: 23, p3: 81, closed: 104, slaOut: 1 },
+      { name: "Generic Accounts", p1: 0, p2: 36, p3: 43, closed: 79, slaOut: 0 },
+      { name: "Holcim Guatemala", p1: 0, p2: 12, p3: 48, closed: 60, slaOut: 2 },
+      { name: "Holcim Costa Rica", p1: 0, p2: 20, p3: 19, closed: 39, slaOut: 0 },
+      { name: "Holcim Nicaragua", p1: 0, p2: 5, p3: 15, closed: 20, slaOut: 0 },
+      { name: "Holcim Philippines", p1: 0, p2: 0, p3: 1, closed: 1, slaOut: 0 }
     ].map((row) => ({ ...row, total: row.p1 + row.p2 + row.p3, country: countryOf(row.name) }));
 
-    // Cifras del consolidado. No están abiertas por empresa, país ni prioridad.
-    const EXTRAS = { inProgress: 605, reopened: 94, reassignAvg: 0.26 };
+    // En este corte todos los registros están cerrados. Reapertura y
+    // reasignación no vienen en el export de cerrados.
+    const EXTRAS = { inProgress: 0, reopened: null, reassignAvg: null };
     const MONTHS = [
-      { label: "Ene", value: 553 },
-      { label: "Feb", value: 378 },
-      { label: "Mar", value: 484 },
-      { label: "Abr", value: 457 },
-      { label: "May", value: 437 },
-      { label: "Jun", value: 416 },
-      { label: "Jul", value: 429 },
-      { label: "Ago", value: 406 },
-      { label: "Sep", value: 360 }
+      { label: "Ene", value: 554 },
+      { label: "Feb", value: 510 },
+      { label: "Mar", value: 499 },
+      { label: "Abr", value: 456 },
+      { label: "May", value: 504 },
+      { label: "Jun", value: 474 },
+      { label: "Jul", value: 488 },
+      { label: "Ago", value: 439 },
+      { label: "Sep", value: 408 }
     ];
-    const CATEGORIES = [
-      { label: "Software", value: 863 },
-      { label: "Security", value: 548 },
-      { label: "Finances & Ctrl", value: 355 },
-      { label: "Cloud", value: 297 },
-      { label: "SAP SD", value: 195 },
-      { label: "DataRooms", value: 191 },
-      { label: "SRM", value: 160 },
-      { label: "SAP MM", value: 157 },
-      { label: "Hardware", value: 129 }
-    ];
+    const CATEGORIES = [];
 
     const state = {
       module: "incidents",
@@ -471,13 +466,18 @@
       const slaDetail = sel.allPriorities
         ? `<small class="${sel.totals.slaOut > 0 ? "breach" : ""}">${fmt(sel.totals.slaOut)} fuera de SLA</small>`
         : "<small>No está abierto por prioridad</small>";
-      const reopen = sel.full ? pct(EXTRAS.reopened / COMPANIES.reduce((sum, row) => sum + row.total, 0)) : "—";
+      const reopen = sel.full && EXTRAS.reopened != null
+        ? pct(EXTRAS.reopened / COMPANIES.reduce((sum, row) => sum + row.total, 0))
+        : "—";
+      const reopenDetail = !sel.full
+        ? "Disponible en el consolidado"
+        : (EXTRAS.reopened == null ? "No está en el export de cerrados" : "");
       return `<section class="kpis">
         ${kpi(fmt(sel.totals.total), "Incidentes", "navy")}
         <article class="kpi tone-${tone === "na" ? "navy" : tone}"><b>${pct(slaRatio(sel.totals))}</b><span>Cumplimiento SLA</span>${slaDetail}</article>
         ${kpi(pct(closeRatio(sel.totals)), "Tasa de cierre", "green", sel.allPriorities ? "" : "No está abierta por prioridad")}
         ${kpi(fmt(sel.totals.p1), "Incidentes P1", sel.totals.p1 ? "hot" : "navy")}
-        ${kpi(reopen, "Tasa de reapertura", "navy", sel.full ? "" : "Disponible en el consolidado")}
+        ${kpi(reopen, "Tasa de reapertura", "navy", reopenDetail)}
       </section>`;
     }
 
@@ -490,13 +490,13 @@
 
     function generalView(sel) {
       const closed = sel.allPriorities ? fmt(sel.totals.closed) : "—";
-      const progress = sel.full ? fmt(EXTRAS.inProgress) : "—";
-      const reopened = sel.full ? fmt(EXTRAS.reopened) : "—";
-      const reassign = sel.full ? decFmt.format(EXTRAS.reassignAvg) : "—";
+      const progress = sel.full && EXTRAS.inProgress != null ? fmt(EXTRAS.inProgress) : "—";
+      const reopened = sel.full && EXTRAS.reopened != null ? fmt(EXTRAS.reopened) : "—";
+      const reassign = sel.full && EXTRAS.reassignAvg != null ? decFmt.format(EXTRAS.reassignAvg) : "—";
       const chartsHtml = sel.rows.length ? `<section class="grid">
         <article class="card"><h2>Incidentes por prioridad</h2><div class="chart"><canvas id="chartPriority"></canvas></div></article>
         <article class="card"><h2>Top categorías de servicio</h2>
-          ${sel.full ? '<div class="chart"><canvas id="chartCategory"></canvas></div><p class="note">Top categorías cargadas. No suman el total de incidentes.</p>' : '<p class="empty-inline">El detalle por categoría está cargado solo para el consolidado.</p>'}
+          ${sel.full && CATEGORIES.length ? '<div class="chart"><canvas id="chartCategory"></canvas></div><p class="note">Top categorías cargadas. No suman el total de incidentes.</p>' : '<p class="empty-inline">El detalle por categoría no está en el export de incidentes cerrados.</p>'}
         </article>
       </section>` : '<p class="empty-inline">Ninguna empresa coincide con los filtros.</p>';
       return `${kpis(sel)}
@@ -604,7 +604,7 @@
       const series = sel.full ? `<article class="card">
           <h2>Acumulado de la serie mensual</h2>
           <div class="chart tall"><canvas id="chartYtd"></canvas></div>
-          <p class="note">La serie mensual suma ${fmt(monthSum)} incidentes. El total por empresa es ${fmt(COMPANIES.reduce((sum, row) => sum + row.total, 0))}; la diferencia no está abierta por mes.</p>
+          <p class="note">La serie mensual suma ${fmt(monthSum)} incidentes cerrados y coincide con el total por empresa, ${fmt(COMPANIES.reduce((sum, row) => sum + row.total, 0))}.</p>
         </article>` : `<article class="card"><p class="empty-inline">La serie mensual está cargada solo para el consolidado.</p></article>`;
       return `${kpis(sel)}
         <article class="card"><h2>Ranking por país</h2><div class="chart" id="ytdChartBox"><canvas id="chartYtdCountry"></canvas></div></article>
@@ -630,7 +630,7 @@
       return `<article class="card">
           <h2>Evolución mensual de incidentes</h2>
           <div class="chart tall"><canvas id="chartTrend"></canvas></div>
-          <p class="note">Enero a septiembre. La serie suma ${fmt(monthSum)} incidentes y el total por empresa es ${fmt(COMPANIES.reduce((sum, row) => sum + row.total, 0))}.</p>
+          <p class="note">Enero a septiembre 2026, por mes de cierre. La serie suma ${fmt(monthSum)} incidentes y coincide con el total por empresa.</p>
         </article>
         <article class="card"><h2>Detalle mensual</h2>
           <div class="tw"><table><thead><tr><th>Mes</th><th>Incidentes</th><th>Acumulado</th></tr></thead><tbody>${body}</tbody></table></div>
@@ -937,7 +937,7 @@
         cover.addShape("rect", { x: 0, y: 0, w: 0.18, h: 7.5, fill: { color: "94C12E" } });
         cover.addText("HOLCIM", { x: 0.8, y: 1.8, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 14, color: "94C12E", bold: true, charSpacing: 2 });
         cover.addText("LA - Monthly Operations Report", { x: 0.8, y: 2.25, w: 11, h: 0.7, fontFace: "Montserrat", fontSize: 32, color: "FFFFFF", bold: true });
-        cover.addText("Incidentes · enero a septiembre", { x: 0.8, y: 3.1, w: 10, h: 0.35, fontFace: "Montserrat", fontSize: 16, color: "04BBF1" });
+        cover.addText("Incidentes cerrados · enero a septiembre 2026", { x: 0.8, y: 3.1, w: 10, h: 0.35, fontFace: "Montserrat", fontSize: 16, color: "04BBF1" });
         cover.addText(scopeLine(sel), { x: 0.8, y: 3.7, w: 11, h: 0.4, fontFace: "Montserrat", fontSize: 14, color: "FFFFFF" });
         cover.addText("Request y Changes: sin datos cargados", { x: 0.8, y: 6.6, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 12, color: "FFFFFF" });
 
