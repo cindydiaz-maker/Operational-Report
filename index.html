@@ -263,7 +263,7 @@
         <div>
           <div class="brand">HOLCIM</div>
           <h1>LA - Monthly Operations Report</h1>
-          <p class="sub">Incidentes cerrados · enero a septiembre 2026</p>
+          <p class="sub">Incidentes cerrados · enero a septiembre 2026 · hora de Bogotá</p>
         </div>
         <button id="export" class="export" type="button">Exportar a PowerPoint</button>
       </div>
@@ -464,7 +464,7 @@
     function kpis(sel) {
       const tone = slaClass(slaRatio(sel.totals));
       const slaDetail = sel.allPriorities
-        ? `<small class="${sel.totals.slaOut > 0 ? "breach" : ""}">${fmt(sel.totals.slaOut)} fuera de SLA</small>`
+        ? `<small class="${sel.totals.slaOut > 0 ? "breach" : ""}">${fmt(sel.totals.slaOut)} fuera de SLA · solo cerrados</small>`
         : "<small>No está abierto por prioridad</small>";
       const reopen = sel.full && EXTRAS.reopened != null
         ? pct(EXTRAS.reopened / COMPANIES.reduce((sum, row) => sum + row.total, 0))
@@ -576,7 +576,7 @@
           ${chart}
           <article class="card">
             <h2>Cómo se lee el SLA</h2>
-            <p class="note">Un incidente incumplido es el que llega con Out of SLA en verdadero. En esta vista el cumplimiento es 1 − (cerrados fuera de SLA ÷ cerrados). Canadá ECAN y Corporate France se reportan en Global.</p>
+            <p class="note">El SLA se mide solo sobre incidentes cerrados, en hora de Bogotá. Un incumplido es el que llega con Out of SLA en verdadero. El cumplimiento es 1 − (cerrados fuera de SLA ÷ cerrados). Canadá ECAN y Corporate France se reportan en Global.</p>
             <ul class="legend">
               <li><i class="dot ok"></i> 95% o más</li>
               <li><i class="dot mid"></i> de 80% a menos de 95%</li>
@@ -937,7 +937,7 @@
         cover.addShape("rect", { x: 0, y: 0, w: 0.18, h: 7.5, fill: { color: "94C12E" } });
         cover.addText("HOLCIM", { x: 0.8, y: 1.8, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 14, color: "94C12E", bold: true, charSpacing: 2 });
         cover.addText("LA - Monthly Operations Report", { x: 0.8, y: 2.25, w: 11, h: 0.7, fontFace: "Montserrat", fontSize: 32, color: "FFFFFF", bold: true });
-        cover.addText("Incidentes cerrados · enero a septiembre 2026", { x: 0.8, y: 3.1, w: 10, h: 0.35, fontFace: "Montserrat", fontSize: 16, color: "04BBF1" });
+        cover.addText("Incidentes cerrados · enero a septiembre 2026 · hora de Bogotá", { x: 0.8, y: 3.1, w: 11.5, h: 0.35, fontFace: "Montserrat", fontSize: 16, color: "04BBF1" });
         cover.addText(scopeLine(sel), { x: 0.8, y: 3.7, w: 11, h: 0.4, fontFace: "Montserrat", fontSize: 14, color: "FFFFFF" });
         cover.addText("Request y Changes: sin datos cargados", { x: 0.8, y: 6.6, w: 10, h: 0.3, fontFace: "Montserrat", fontSize: 12, color: "FFFFFF" });
 
