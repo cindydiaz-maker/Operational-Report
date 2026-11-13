@@ -10,13 +10,21 @@
  *   SN_USER             usuario de integración de solo lectura
  *   SN_PASSWORD         clave de ese usuario
  *   SN_QUERY_INCIDENTS  query codificado de incident (opcional hasta tenerlo)
- *   SN_QUERY_REQUEST    query codificado de request (opcional hasta tenerlo)
+ *   SN_QUERY_REQUEST    query codificado de sc_task (opcional hasta tenerlo).
+ *                       El reporte LA de Request se arma sobre la tabla task.
  *   SN_QUERY_CHANGES    query codificado de change_request
+ *
+ * Cada conteo se limita desde FECHA_INICIO hasta el día anterior, con el mismo
+ * formato de fechas que el spreadsheet de queries (BETWEEN con gs.dateGenerate
+ * a las 00:00:00). El día de corte se calcula en America/Bogota.
  */
+
+var FECHA_INICIO = "2026-01-01";
+var CAMPO_CORTE = "sys_created_on";
 
 var MODULOS = {
   incidents: { tabla: "incident", propiedad: "SN_QUERY_INCIDENTS" },
-  request: { tabla: "sc_request", propiedad: "SN_QUERY_REQUEST" },
+  request: { tabla: "sc_task", propiedad: "SN_QUERY_REQUEST" },
   changes: { tabla: "change_request", propiedad: "SN_QUERY_CHANGES" }
 };
 
@@ -58,16 +66,62 @@ function probarQueries() {
   Logger.log(JSON.stringify(getReport(), null, 2));
 }
 
+/**
+ * Cuenta como la lista de ServiceNow. El API de stats no aplica ^NQ igual
+ * que la lista, y por eso el total no coincidía con el export directo.
+ * X-Total-Count es el mismo número que muestra la lista al bajarla.
+ */
 function contar_(tabla, query) {
-  var ruta = "/api/now/stats/" + tabla +
-    "?sysparm_count=true&sysparm_query=" + encodeURIComponent(query);
+  var limpio = query;
+  if (query.indexOf("%5E") !== -1 || query.indexOf("%3D") !== -1) {
+    try {
+      limpio = decodeURIComponent(query.replace(/\+/g, " "));
+    } catch (error) {
+      limpio = query;
+    }
+  }
+  limpio = hastaAyer_(limpio);
+  var ruta = "/api/now/table/" + tabla +
+    "?sysparm_limit=1&sysparm_fields=sys_id&sysparm_exclude_reference_link=true&sysparm_query=" +
+    encodeURIComponent(limpio);
   var respuesta = pedir_(ruta);
   var codigo = respuesta.getResponseCode();
   if (codigo !== 200) {
     return { ok: false, codigo: codigo, detalle: respuesta.getContentText().slice(0, 300) };
   }
-  var cuerpo = JSON.parse(respuesta.getContentText());
-  return { ok: true, count: Number(cuerpo.result.stats.count) };
+  var total = encabezado_(respuesta, "X-Total-Count");
+  if (total === "") {
+    return { ok: false, codigo: codigo, detalle: "ServiceNow no devolvió X-Total-Count." };
+  }
+  return { ok: true, count: Number(total) };
+}
+
+/**
+ * ^NQ separa bloques unidos con OR, así que el límite se agrega a cada uno;
+ * si solo va al final, los demás bloques quedan sin fecha. El límite superior
+ * es el inicio de hoy en Bogotá, así que el día anterior queda completo.
+ */
+function hastaAyer_(query) {
+  var hoy = Utilities.formatDate(new Date(), "America/Bogota", "yyyy-MM-dd");
+  var filtro = "^" + CAMPO_CORTE + "BETWEENjavascript:gs.dateGenerate('" + FECHA_INICIO +
+    "','00:00:00')@javascript:gs.dateGenerate('" + hoy + "','00:00:00')";
+  return query.split("^NQ").map(function (bloque) {
+    var limpio = bloque.replace(/^\^+|\^+$/g, "");
+    return limpio ? limpio + filtro : limpio;
+  }).join("^NQ");
+}
+
+function encabezado_(respuesta, nombre) {
+  var headers = respuesta.getAllHeaders();
+  var buscado = nombre.toLowerCase();
+  var claves = Object.keys(headers);
+  for (var i = 0; i < claves.length; i++) {
+    if (claves[i].toLowerCase() === buscado) {
+      var valor = headers[claves[i]];
+      return Array.isArray(valor) ? String(valor[0]) : String(valor);
+    }
+  }
+  return "";
 }
 
 function pedir_(ruta) {

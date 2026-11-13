@@ -17,7 +17,7 @@ En Apps Script el HTML vive dentro del proyecto. Cuando alguien abre la direcci�
 2. Apps Script entrega `Index.html` al navegador.
 3. La página llama a `getReport()`. Esa llamada va a `Code.gs`.
 4. `Code.gs` lee las credenciales de las propiedades del script y consulta la API de ServiceNow.
-5. ServiceNow devuelve conteos.
+5. ServiceNow devuelve el mismo total que la lista (`X-Total-Count`), no el conteo del API de estadísticas. Ese API no respeta los bloques `^NQ` y por eso el número no coincidía con el export.
 6. El navegador recibe solo totales y los pinta.
 
 La clave y el detalle de cada registro no salen del servidor.
@@ -32,8 +32,10 @@ Se configuran en Apps Script, **Configuración del proyecto → Propiedades de s
 | `SN_USER` | Usuario de integración con permiso de solo lectura. |
 | `SN_PASSWORD` | Clave de ese usuario. |
 | `SN_QUERY_INCIDENTS` | Query codificado de la tabla `incident`. |
-| `SN_QUERY_REQUEST` | Query codificado de la tabla `sc_request`. |
+| `SN_QUERY_REQUEST` | Query codificado de la tabla `sc_task`. El reporte LA de Request se cuenta sobre task, que es lo que se baja de ServiceNow. |
 | `SN_QUERY_CHANGES` | Query codificado de la tabla `change_request`. |
+
+El script agrega solo el corte de fechas, con el mismo formato que el spreadsheet de queries: `sys_created_on` entre `FECHA_INICIO` y el inicio de hoy en `America/Bogota`, con `gs.dateGenerate` a las `00:00:00`. Ese límite va dentro de cada bloque `^NQ` del query, así que no hace falta escribirlo en la propiedad. El usuario de integración en ServiceNow debe tener la zona horaria `America/Bogota`, porque `gs.dateGenerate` interpreta la fecha en la zona del usuario.
 
 Los queries se guardan como propiedades, no en el código, porque el repositorio es público y los queries llevan identificadores internos de ServiceNow. Un módulo sin query aparece como "Sin query" y no rompe a los demás.
 
