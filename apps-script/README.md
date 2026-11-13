@@ -35,7 +35,7 @@ Se configuran en Apps Script, **Configuración del proyecto → Propiedades de s
 | `SN_QUERY_REQUEST` | Query codificado de la tabla `sc_task`. El reporte LA de Request se cuenta sobre task, que es lo que se baja de ServiceNow. |
 | `SN_QUERY_CHANGES` | Query codificado de la tabla `change_request`. |
 
-El script agrega solo el corte de fechas: desde `FECHA_INICIO` (en `Code.gs`) hasta el final del día anterior, usando `closed_at`. Ese límite va dentro de cada bloque `^NQ` del query, así que no hace falta escribirlo en la propiedad. El usuario de integración en ServiceNow debe tener la zona horaria `America/Bogota`, porque `gs.endOfYesterday()` usa la zona del usuario.
+El script agrega solo el corte de fechas, con el mismo formato que el spreadsheet de queries: `sys_created_on` entre `FECHA_INICIO` y el inicio de hoy en `America/Bogota`, con `gs.dateGenerate` a las `00:00:00`. Ese límite va dentro de cada bloque `^NQ` del query, así que no hace falta escribirlo en la propiedad. El usuario de integración en ServiceNow debe tener la zona horaria `America/Bogota`, porque `gs.dateGenerate` interpreta la fecha en la zona del usuario.
 
 Los queries se guardan como propiedades, no en el código, porque el repositorio es público y los queries llevan identificadores internos de ServiceNow. Un módulo sin query aparece como "Sin query" y no rompe a los demás.
 
