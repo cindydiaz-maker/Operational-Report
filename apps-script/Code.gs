@@ -13,7 +13,13 @@
  *   SN_QUERY_REQUEST    query codificado de sc_task (opcional hasta tenerlo).
  *                       El reporte LA de Request se arma sobre la tabla task.
  *   SN_QUERY_CHANGES    query codificado de change_request
+ *
+ * Cada conteo se limita desde FECHA_INICIO hasta el final del día anterior
+ * (hora del usuario de integración en ServiceNow, que debe ser America/Bogota).
  */
+
+var FECHA_INICIO = "2026-01-01";
+var CAMPO_CORTE = "closed_at";
 
 var MODULOS = {
   incidents: { tabla: "incident", propiedad: "SN_QUERY_INCIDENTS" },
@@ -73,6 +79,7 @@ function contar_(tabla, query) {
       limpio = query;
     }
   }
+  limpio = hastaAyer_(limpio);
   var ruta = "/api/now/table/" + tabla +
     "?sysparm_limit=1&sysparm_fields=sys_id&sysparm_exclude_reference_link=true&sysparm_query=" +
     encodeURIComponent(limpio);
@@ -86,6 +93,19 @@ function contar_(tabla, query) {
     return { ok: false, codigo: codigo, detalle: "ServiceNow no devolvió X-Total-Count." };
   }
   return { ok: true, count: Number(total) };
+}
+
+/**
+ * ^NQ separa bloques unidos con OR, así que el límite se agrega a cada uno;
+ * si solo va al final, los demás bloques quedan sin fecha.
+ */
+function hastaAyer_(query) {
+  var filtro = "^" + CAMPO_CORTE + "BETWEENjavascript:gs.dateGenerate('" + FECHA_INICIO +
+    "','00:00:00')@javascript:gs.endOfYesterday()";
+  return query.split("^NQ").map(function (bloque) {
+    var limpio = bloque.replace(/^\^+|\^+$/g, "");
+    return limpio ? limpio + filtro : limpio;
+  }).join("^NQ");
 }
 
 function encabezado_(respuesta, nombre) {
